@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NACL Mock Test — ฝึกทำข้อสอบ</title>
+<meta name="description" content="เว็บฝึกทำข้อสอบจำลอง NACL รอบทฤษฎี 5 ชุด 130 ข้อ 305 คะแนน พร้อมเฉลย จับเวลา และสรุปคะแนนรายหมวด">
+<meta name="theme-color" content="#1266CC">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231266CC'/><text y='72' x='50' font-size='58' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'>N</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+
+<header class="appbar">
+  <div class="wrap appbar-in">
+    <button class="brand" data-nav="home" type="button">
+      <span class="brand-mark">N</span>
+      <span class="brand-text">
+        <strong>NACL Mock Test</strong>
+        <small>ฝึกทำข้อสอบรอบทฤษฎี</small>
+      </span>
+    </button>
+    <nav class="appbar-nav">
+      <button class="ghost-btn" data-nav="home" type="button">หน้าแรก</button>
+      <button class="ghost-btn" data-nav="history" type="button">ประวัติ</button>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมดสว่าง/มืด">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path class="ic-sun" d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66l1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14l-1.41-1.41M12 8a4 4 0 100 8 4 4 0 000-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="ic-moon" d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ═══════════ LOADING ═══════════ -->
+  <section id="view-loading" class="view is-active">
+    <div class="wrap center-pad">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="muted">กำลังโหลดคลังข้อสอบ…</p>
+    </div>
+  </section>
+
+  <!-- ═══════════ ERROR ═══════════ -->
+  <section id="view-error" class="view">
+    <div class="wrap center-pad">
+      <div class="card pad-lg" style="max-width:640px;margin-inline:auto">
+        <h2 class="h2">โหลดข้อมูลข้อสอบไม่สำเร็จ</h2>
+        <p class="muted" id="errorMsg"></p>
+        <p class="muted">ถ้าคุณเปิดไฟล์นี้จากเครื่องโดยตรง (<code>file://</code>) เบราว์เซอร์จะบล็อกการอ่านไฟล์ JSON<br>
+          ให้รันเซิร์ฟเวอร์ในโฟลเดอร์นี้แทน:</p>
+        <pre class="code-block">python3 -m http.server 8000
+# แล้วเปิด http://localhost:8000</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <div class="wrap hero-in">
+        <div class="hero-copy">
+          <span class="pill">ข้อสอบจำลองตาม blueprint จริง</span>
+          <h1>เตรียมสอบ NACL <br>ให้พร้อมก่อนวันจริง</h1>
+          <p>ฝึกทำข้อสอบ 5 ชุด ชุดละ 130 ข้อ 305 คะแนน ครบ 8 หมวดตามสัดส่วนจริง
+             พร้อมจับเวลา เฉลยละเอียด และสรุปจุดอ่อนรายหมวด</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-lg" id="heroStart" type="button">เริ่มทำข้อสอบ</button>
+            <button class="btn btn-quiet btn-lg" data-nav="history" type="button">ดูประวัติของฉัน</button>
+          </div>
+        </div>
+        <div class="hero-stats" id="heroStats"></div>
+      </div>
+    </div>
+
+    <div class="wrap stack-xl">
+
+      <div class="resume-bar" id="resumeBar" hidden>
+        <div>
+          <strong>คุณมีข้อสอบที่ทำค้างไว้</strong>
+          <span class="muted" id="resumeMeta"></span>
+        </div>
+        <div class="resume-actions">
+          <button class="btn btn-primary" id="resumeBtn" type="button">ทำต่อ</button>
+          <button class="btn btn-quiet" id="discardBtn" type="button">ล้างทิ้ง</button>
+        </div>
+      </div>
+
+      <section id="startPanel">
+        <h2 class="section-title">1. เลือกโหมดการฝึก</h2>
+        <div class="mode-grid" role="radiogroup" aria-label="โหมดการฝึก">
+          <button class="mode-card is-on" data-mode="full" role="radio" aria-checked="true" type="button">
+            <span class="mode-ic">📝</span>
+            <strong>ทำเต็มชุด</strong>
+            <span class="muted">130 ข้อ · 305 คะแนน ครบทั้ง 8 หมวด เหมือนสนามสอบจริง</span>
+          </button>
+          <button class="mode-card" data-mode="mix" role="radio" aria-checked="false" type="button">
+            <span class="mode-ic">🎲</span>
+            <strong>สุ่มคละทุกชุด</strong>
+            <span class="muted">คละคำถามจากทั้ง 5 ชุด ตามสัดส่วน blueprint (ตัดข้อซ้ำออก)</span>
+          </button>
+          <button class="mode-card" data-mode="category" role="radio" aria-checked="false" type="button">
+            <span class="mode-ic">🎯</span>
+            <strong>ฝึกรายหมวด</strong>
+            <span class="muted">เจาะเฉพาะหมวดที่ยังอ่อน เช่น Subnetting หรือ Cloud</span>
+          </button>
+        </div>
+
+        <div id="setPicker">
+          <h2 class="section-title">2. เลือกชุดข้อสอบ</h2>
+          <div class="set-grid" id="setGrid"></div>
+        </div>
+
+        <div id="catPicker" hidden>
+          <h2 class="section-title">2. เลือกหมวดที่ต้องการฝึก</h2>
+          <div class="cat-list" id="catList"></div>
+          <div class="field-row">
+            <label class="field">
+              <span>จำนวนข้อ</span>
+              <select id="catCount">
+                <option value="10">10 ข้อ</option>
+                <option value="20" selected>20 ข้อ</option>
+                <option value="30">30 ข้อ</option>
+                <option value="50">50 ข้อ</option>
+                <option value="0">ทั้งหมดที่มี</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <h2 class="section-title">3. ตั้งค่าการทำข้อสอบ</h2>
+        <div class="card pad-lg settings-card">
+          <div class="field-row">
+            <label class="field">
+              <span>เวลาในการทำ</span>
+              <select id="timeLimit">
+                <option value="0">ไม่จำกัดเวลา (จับเวลาขึ้น)</option>
+                <option value="60">60 นาที</option>
+                <option value="90">90 นาที</option>
+                <option value="120" selected>120 นาที</option>
+                <option value="180">180 นาที</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>เกณฑ์ข้อเลือกหลายคำตอบ</span>
+              <select id="msRule">
+                <option value="all">ถูกครบทุกตัวจึงได้คะแนน (แนะนำ)</option>
+                <option value="partial">ให้คะแนนบางส่วนตามสัดส่วน</option>
+              </select>
+            </label>
+          </div>
+          <div class="toggle-list">
+            <label class="switch">
+              <input type="checkbox" id="optPenalty" checked>
+              <span class="track"></span>
+              <span class="switch-label">หักคะแนนข้อปรนัยที่ตอบผิด −1 <em>(ตาม blueprint จริง)</em></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optAutoNext" checked>
+              <span class="track"></span>
+              <span class="switch-label">เลื่อนไปข้อถัดไปอัตโนมัติเมื่อเลือกคำตอบ</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optShuffleQ">
+              <span class="track"></span>
+              <span class="switch-label">สลับลำดับข้อ</span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optShuffleO">
+              <span class="track"></span>
+              <span class="switch-label">สลับลำดับตัวเลือก <em>(ลดการจำตำแหน่งคำตอบ)</em></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="optInstant">
+              <span class="track"></span>
+              <span class="switch-label">โหมดฝึก: เฉลยทันทีหลังตอบแต่ละข้อ</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="start-dock">
+          <div class="start-summary" id="startSummary"></div>
+          <button class="btn btn-primary btn-lg" id="startBtn" type="button">เริ่มทำข้อสอบ</button>
+        </div>
+
+        <div class="note-box">
+          <strong>ข้อควรทราบ</strong>
+          <ul>
+            <li>ข้อสอบชุดนี้ <b>จำลองรูปแบบและสัดส่วน</b> ตาม blueprint จริง ไม่ใช่ข้อสอบจริง</li>
+            <li>ข้อปรนัย 5 ตัวเลือก: ตอบถูก +2 / ตอบผิด −1 / ไม่ตอบ 0 — <b>การเดาสุ่มมีต้นทุน</b></li>
+            <li>เกณฑ์คะแนนข้อ “เลือกหลายคำตอบ” และ “เขียนตอบ” ไม่ได้ระบุใน blueprint เว็บนี้ตั้งค่าเริ่มต้นไว้ที่ข้อละ 5 คะแนน</li>
+            <li>หมวด Cloud Computing และความสนใจทั่วไปด้านเทคโนโลยี มีคลังคำถามจำกัด จึงอาจพบข้อซ้ำข้ามชุด</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ═══════════ EXAM ═══════════ -->
+  <section id="view-exam" class="view">
+    <div class="exam-bar">
+      <div class="wrap exam-bar-in">
+        <div class="exam-id">
+          <strong id="examTitle"></strong>
+          <span class="muted" id="examCat"></span>
+        </div>
+        <div class="exam-progress">
+          <div class="bar"><i id="progFill"></i></div>
+          <span class="muted" id="progText"></span>
+        </div>
+        <div class="exam-tools">
+          <div class="timer" id="timer" title="เวลาที่ใช้ / เวลาที่เหลือ">00:00</div>
+          <button class="btn btn-quiet" id="paletteBtn" type="button" aria-expanded="false">ผังข้อ</button>
+          <button class="btn btn-primary" id="submitBtn" type="button">ส่งคำตอบ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap exam-layout">
+      <div class="exam-main">
+        <article class="qcard card" id="qcard"></article>
+        <div class="qnav">
+          <button class="btn btn-quiet" id="prevBtn" type="button">← ข้อก่อนหน้า</button>
+          <button class="btn btn-flag" id="flagBtn" type="button">🚩 ทำเครื่องหมายไว้</button>
+          <button class="btn btn-primary" id="nextBtn" type="button">ข้อถัดไป →</button>
+        </div>
+        <p class="kbd-hint muted">คีย์ลัด: <kbd>1</kbd>–<kbd>5</kbd> เลือกตัวเลือก · <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนข้อ · <kbd>F</kbd> ทำเครื่องหมาย</p>
+      </div>
+      <aside class="palette" id="palette" aria-label="ผังข้อสอบ">
+        <div class="palette-head">
+          <strong>ผังข้อสอบ</strong>
+          <button class="icon-btn" id="paletteClose" type="button" aria-label="ปิดผังข้อ">✕</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot dot-done"></i>ตอบแล้ว</span>
+          <span><i class="dot dot-flag"></i>ทำเครื่องหมาย</span>
+          <span><i class="dot dot-empty"></i>ยังไม่ตอบ</span>
+        </div>
+        <div id="paletteBody"></div>
+      </aside>
+      <div class="scrim" id="scrim" hidden></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ RESULT ═══════════ -->
+  <section id="view-result" class="view">
+    <div class="wrap stack-xl">
+      <div class="result-hero card pad-lg" id="resultHero"></div>
+      <section>
+        <h2 class="section-title">คะแนนรายหมวด</h2>
+        <div class="card pad-lg" id="catBreakdown"></div>
+      </section>
+      <section>
+        <div class="review-head">
+          <h2 class="section-title" style="margin:0">เฉลยและคำอธิบาย</h2>
+          <div class="seg" role="group" aria-label="กรองข้อ">
+            <button class="seg-btn is-on" data-filter="wrong" type="button">ตอบผิด</button>
+            <button class="seg-btn" data-filter="blank" type="button">ไม่ได้ตอบ</button>
+            <button class="seg-btn" data-filter="all" type="button">ทั้งหมด</button>
+          </div>
+        </div>
+        <div id="reviewList" class="stack-md"></div>
+      </section>
+      <div class="result-actions">
+        <button class="btn btn-primary btn-lg" id="retryBtn" type="button">ทำชุดใหม่อีกครั้ง</button>
+        <button class="btn btn-quiet btn-lg" data-nav="history" type="button">ดูประวัติทั้งหมด</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ HISTORY ═══════════ -->
+  <section id="view-history" class="view">
+    <div class="wrap stack-xl">
+      <h1 class="h1">ประวัติการทำข้อสอบ</h1>
+      <div id="historyBody"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>NACL Mock Test · ข้อสอบจำลองอ้างอิงโครงสร้างจาก <a href="https://nextpath.ce-nacl.com/blueprint" target="_blank" rel="noopener">blueprint ของสนามสอบ</a> · ข้อมูลบันทึกไว้ในเบราว์เซอร์ของคุณเท่านั้น</p>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-quiet" id="modalCancel" type="button">ยกเลิก</button>
+      <button class="btn btn-primary" id="modalOk" type="button">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>
