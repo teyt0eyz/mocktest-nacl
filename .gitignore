@@ -12,3 +12,7 @@
 # logs / temp
 *.log
 node_modules/
+
+# python
+__pycache__/
+*.pyc
