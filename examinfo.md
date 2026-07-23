@@ -240,12 +240,24 @@
 ## หมวด 5 — ระบบเครือข่าย
 **(85 คะแนน! · ปรนัย 25 + เลือกหลายคำตอบ 5 + เขียนตอบ 2) — หมวดหนักสุด เตรียมให้ดี**
 
-### 5.1 Client-Server Model & แบบจำลองชั้น
-- **OSI 7 ชั้น** (บน→ล่าง): **A**pplication → **P**resentation → **S**ession → **T**ransport → **N**etwork → **D**ata Link → **P**hysical
-  - ท่อง: *"All People Seem To Need Data Processing"*
-- **PDU แต่ละชั้น:** L7-5 = Data, L4 = Segment (TCP)/Datagram (UDP), L3 = Packet, L2 = Frame, L1 = Bit
-- **TCP/IP 4 ชั้น:** Application / Transport / Internet / Network Access
-- **Client-Server** (รวมศูนย์ที่เซิร์ฟเวอร์) vs **Peer-to-Peer** (เท่าเทียม)
+### 5.1 OSI Model, TCP/IP Model & แบบจำลองชั้น (⭐ ออกบ่อย)
+ท่อง OSI บน→ล่าง: *"**A**ll **P**eople **S**eem **T**o **N**eed **D**ata **P**rocessing"*
+
+| ชั้น | ชื่อ | หน้าที่ | PDU (หน่วยข้อมูล) | Protocol | อุปกรณ์ |
+|--|--|--|--|--|--|
+| **7** | Application | ติดต่อผู้ใช้/แอปพลิเคชัน | Data | HTTP(S), FTP, SMTP, DNS, DHCP, SNMP, Telnet, SSH, POP3, IMAP | Gateway, Host, Firewall (L7) |
+| **6** | Presentation | เข้ารหัส/ถอดรหัส, แปลงรูปแบบ, บีบอัด | Data | TLS/SSL, JPEG, PNG, ASCII, MPEG | — |
+| **5** | Session | สร้าง/จัดการ/ปิด session | Data | NetBIOS, RPC, PPTP, Sockets | — |
+| **4** | Transport | ส่งต้นทาง→ปลายทาง, reliability, แบ่ง segment, port | **Segment** (TCP) / **Datagram** (UDP) | TCP, UDP | Firewall (L4), Load Balancer (L4) |
+| **3** | Network | หาเส้นทาง (routing), addressing ด้วย IP | **Packet** | IP, ICMP, OSPF, BGP, IPsec (ARP คาบ L2/3) | **Router**, L3 Switch |
+| **2** | Data Link | สร้าง frame, MAC addressing, ตรวจ error | **Frame** | Ethernet, PPP, ARP, STP, VLAN(802.1Q) | **Switch**, Bridge, NIC |
+| **1** | Physical | บิต/สัญญาณไฟฟ้า-แสง, สื่อกลาง | **Bit** | (สายทองแดง, Fiber, Wi-Fi radio, RJ45) | **Hub**, Repeater, สาย/สื่อ |
+
+- **TCP/IP 4 ชั้น (จับคู่ OSI):** Application (L5-7) · Transport (L4) · **Internet** (L3) · **Network Access/Link** (L1-2)
+- **Encapsulation (ห่อข้อมูลลงชั้นล่าง):** Data → Segment → Packet → Frame → Bits · ฝั่งรับทำ **De-encapsulation** ย้อนขึ้น
+- **จำ PDU:** ชั้นสูง=Data · L4=Segment/Datagram · L3=**Packet** · L2=**Frame** · L1=**Bit**
+- **Client-Server** (รวมศูนย์ที่เซิร์ฟเวอร์, ขอ-ตอบ) vs **Peer-to-Peer** (ทุกโหนดเท่าเทียม เป็นทั้ง client/server)
+- **อุปกรณ์แยกตาม domain:** Hub = 1 collision + 1 broadcast domain · Switch = แยก collision domain (แต่ 1 broadcast) · Router/VLAN = แยก broadcast domain
 
 ### 5.2 Network Devices & Link
 | อุปกรณ์ | Layer | หน้าที่ |
@@ -340,11 +352,13 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
 | DELETE | ลบ | ✗ | ✓ |
 | HEAD | เหมือน GET ไม่เอา body | ✓ | ✓ |
 
-**Status Code:**
-- **1xx** ข้อมูล · **2xx สำเร็จ:** 200 OK, 201 Created, 204 No Content
-- **3xx redirect:** 301 Moved Permanently, 302 Found, 304 Not Modified (ใช้ cache)
-- **4xx ผิดฝั่ง client:** 400 Bad Request, 401 Unauthorized (ยังไม่ auth), 403 Forbidden (ไม่มีสิทธิ), 404 Not Found, 405 Method Not Allowed, 409 Conflict, 429 Too Many Requests
-- **5xx ผิดฝั่ง server:** 500 Internal Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout
+**Status Code (จำกลุ่มร้อย + ตัวเด่น):**
+- **1xx Informational:** 100 Continue · 101 Switching Protocols
+- **2xx Success:** **200 OK** · 201 Created · 202 Accepted · 204 No Content · 206 Partial Content (range/สตรีม)
+- **3xx Redirect:** 301 Moved Permanently (ถาวร) · 302 Found (ชั่วคราว) · **304 Not Modified** (ใช้ cache) · 307/308 Temporary/Permanent Redirect (คงเมธอด)
+- **4xx Client Error (ผิดฝั่งผู้ขอ):** **400** Bad Request · **401** Unauthorized (ยังไม่ยืนยันตัวตน) · **403** Forbidden (ยืนยันแล้วแต่ไม่มีสิทธิ) · **404** Not Found · 405 Method Not Allowed · 408 Request Timeout · 409 Conflict · 410 Gone · 413 Payload Too Large · **429** Too Many Requests (rate limit)
+- **5xx Server Error (ผิดฝั่งเซิร์ฟเวอร์):** **500** Internal Server Error · 501 Not Implemented · **502** Bad Gateway · **503** Service Unavailable (โหลดเกิน/ปิดปรับปรุง) · **504** Gateway Timeout
+- 🔑 จำแยก **401 (ไม่รู้ว่าเป็นใคร)** vs **403 (รู้แล้วแต่ห้าม)** · **502 (gateway ได้คำตอบเสีย)** vs **504 (gateway รอ timeout)**
 
 ### 5.10 Network Performance
 - **Bandwidth** = ความจุสูงสุด (bps) · **Throughput** = อัตราจริง · **Latency** = ดีเลย์ · **Jitter** = ความแปรปรวนดีเลย์
@@ -352,6 +366,80 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
   - เช่น 100 MB ผ่าน 50 Mbps = 100×8/50 = **16 วินาที**
 - **Bandwidth-Delay Product (BDP)** = bandwidth × RTT (ปริมาณข้อมูลที่กำลังเดินทาง)
 - **RTT** = round-trip time · **Goodput** = throughput ที่มีประโยชน์จริง (หัก overhead/retransmit)
+
+### 5.11 Network Lab & คำสั่ง Cisco (Switch / Router / VLAN / ACL)
+
+**โหมด Cisco IOS (ลำดับเข้าโหมด):**
+```
+Switch> enable                  ! user EXEC → privileged EXEC
+Switch# configure terminal      ! เข้าโหมด global config
+Switch(config)# ...             ! config ทั้งเครื่อง
+Switch(config-if)# ...          ! config ราย interface
+Switch(config-vlan)# ...        ! config ราย VLAN
+```
+- `exit` ถอยหนึ่งโหมด · `end` / `Ctrl+Z` กลับ privileged · `do <cmd>` รันคำสั่ง EXEC ในโหมด config
+- **บันทึกค่า:** `copy running-config startup-config` (หรือ `write memory` / `wr`)
+
+**คำสั่ง show ที่ใช้ตรวจ (verify):**
+| คำสั่ง | ดูอะไร |
+|--|--|
+| `show running-config` | ค่าคอนฟิกปัจจุบัน |
+| `show ip interface brief` | สรุป IP/สถานะทุกพอร์ต (up/down) |
+| `show vlan brief` | VLAN และพอร์ตที่สังกัด |
+| `show interfaces trunk` | พอร์ต trunk + VLAN ที่ผ่าน |
+| `show mac address-table` | ตาราง MAC ที่สวิตช์เรียนรู้ |
+| `show ip route` | ตาราง routing (C=connected, S=static, O=OSPF) |
+| `show access-lists` | ACL ที่ตั้งไว้ |
+
+**VLAN (แบ่ง broadcast domain เชิงตรรกะ):**
+```
+Switch(config)# vlan 10
+Switch(config-vlan)# name SALES
+Switch(config)# interface fa0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10      ! ใส่พอร์ตเข้า VLAN 10
+```
+- **Trunk** (ส่งหลาย VLAN ข้ามสวิตช์ ใช้แท็ก **802.1Q**):
+```
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,20
+Switch(config-if)# switchport trunk native vlan 99  ! VLAN ที่ไม่ติดแท็ก
+```
+- **Inter-VLAN routing:** ใช้ **Router-on-a-stick** (แบ่ง subinterface + `encapsulation dot1Q <id>`) หรือ **SVI** บน L3 switch (`interface vlan 10` + ตั้ง IP)
+
+**Router — ตั้ง IP interface & เส้นทาง:**
+```
+Router(config)# interface g0/0
+Router(config-if)# ip address 192.168.1.1 255.255.255.0
+Router(config-if)# no shutdown                    ! เปิดพอร์ต (default ปิด)
+Router(config)# ip route 10.0.0.0 255.0.0.0 192.168.1.2   ! static route
+Router(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.2      ! default route
+```
+
+**ACL (Access Control List) — กรองทราฟฟิก:**
+- **Standard (1–99):** กรองตาม **source IP** เท่านั้น → วางใกล้ **ปลายทาง**
+- **Extended (100–199):** กรองตาม source+dest IP, protocol, port → วางใกล้ **ต้นทาง**
+- ใช้ **wildcard mask** (กลับด้าน subnet mask: `0.0.0.255` = ทั้ง /24)
+```
+! Standard: ห้าม 192.168.1.0/24, อนุญาตที่เหลือ
+Router(config)# access-list 10 deny 192.168.1.0 0.0.0.255
+Router(config)# access-list 10 permit any
+Router(config)# interface g0/1
+Router(config-if)# ip access-group 10 out
+
+! Extended: ห้าม host หนึ่งเข้าเว็บ (HTTP/80) ของเซิร์ฟเวอร์
+Router(config)# access-list 100 deny tcp host 192.168.1.5 host 10.0.0.8 eq 80
+Router(config)# access-list 100 permit ip any any
+Router(config-if)# ip access-group 100 in
+```
+- ⚠️ ท้าย ACL มี **implicit deny any** เสมอ (ต้องมี `permit` ปิดท้ายไม่งั้นบล็อกหมด) · อ่านกฎ **บนลงล่าง เจอ match แรกหยุด**
+
+**อื่น ๆ ที่ควรรู้:**
+- **Port Security:** `switchport port-security` จำกัด MAC ต่อพอร์ต (กัน rogue device)
+- **STP (Spanning Tree, 802.1D):** กัน loop ใน L2 (block พอร์ตซ้ำซ้อน)
+- **EtherChannel:** รวมหลายลิงก์เป็นลิงก์ตรรกะเดียว (เพิ่ม bandwidth + redundancy)
+- **DHCP บน router:** `ip dhcp pool <name>` → `network`, `default-router`, `dns-server`
+- **Password:** `enable secret <pw>` (เข้ารหัส), `line vty 0 4` + `login`/`transport input ssh` (รีโมต SSH)
 
 ---
 
@@ -482,11 +570,48 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
 - **Recurrence:** aₙ = k·aₙ₋₁ ± c (เช่น ×2+1: 3,7,15,31) · **จำนวนเฉพาะ:** 2,3,5,7,11,13
 - **สลับ/แทรก:** สลับ 2 กฎ เช่น +3,+2,+3,+2 หรือแทรกสองอนุกรม
 
-### 8.2 ตรรกศาสตร์
-- **Conditional:** `p → q` · **Contrapositive (สมมูล):** `¬q → ¬p` · Converse `q→p` · Inverse `¬p→¬q` (ไม่สมมูลกับต้นฉบับ)
-- `p → q ≡ ¬p ∨ q`
-- **นิเสธ:** ¬(∀x P) = ∃x ¬P · ¬(∃x P) = ∀x ¬P · ¬(p∧q)=¬p∨¬q · ¬(p∨q)=¬p∧¬q
-- **Syllogism:** "ทุก A เป็น B" + "ทุก B เป็น C" → "ทุก A เป็น C" (ระวังคำว่า "บาง")
+### 8.2 ตรรกศาสตร์เชิงประพจน์ (Propositional Logic) ⭐
+
+**ตารางค่าความจริง (Truth Table) — จำให้แม่น:**
+| p | q | ¬p | p∧q (และ) | p∨q (หรือ) | p→q (ถ้า…แล้ว) | p↔q (ก็ต่อเมื่อ) | p⊕q (XOR) |
+|--|--|--|--|--|--|--|--|
+| T | T | F | **T** | T | **T** | **T** | F |
+| T | F | F | F | T | **F** ⚠️ | F | T |
+| F | T | T | F | T | **T** | F | T |
+| F | F | T | F | **F** | **T** | **T** | F |
+
+- 🔑 **`p→q` เป็นเท็จกรณีเดียว:** p จริง แต่ q เท็จ (T→F=F) · ถ้า p เท็จ → เป็นจริงเสมอ (vacuously true)
+- **`p∧q`** จริงเมื่อ **ทั้งคู่จริง** · **`p∨q`** เท็จเมื่อ **ทั้งคู่เท็จ** · **`p↔q`** จริงเมื่อ **ค่าเหมือนกัน** · **XOR** จริงเมื่อ **ต่างกัน**
+- ตัวอย่าง `¬p → q`: ถ้า p เท็จ (¬p จริง) ประโยคเป็นจริงก็ต่อเมื่อ q จริง
+
+**รูปแปลงของประพจน์เงื่อนไข (p→q):**
+| ชื่อ | รูป | สมมูลกับ p→q? |
+|--|--|--|
+| Converse (บทกลับ) | q → p | ❌ ไม่สมมูล |
+| Inverse (นิเสธ) | ¬p → ¬q | ❌ ไม่สมมูล |
+| **Contrapositive** | ¬q → ¬p | ✅ **สมมูล** |
+- `p → q ≡ ¬p ∨ q` (แปลง implication เป็น or)
+
+**กฎสมมูลตรรกศาสตร์ (Logical Equivalences):**
+- **De Morgan:** `¬(p∧q) ≡ ¬p∨¬q` · `¬(p∨q) ≡ ¬p∧¬q`
+- **Double negation:** `¬(¬p) ≡ p` · **Idempotent:** `p∧p ≡ p`, `p∨p ≡ p`
+- **Commutative / Associative / Distributive:** `p∧(q∨r) ≡ (p∧q)∨(p∧r)`
+- **Absorption:** `p∨(p∧q) ≡ p` · **Identity:** `p∧T ≡ p`, `p∨F ≡ p`
+- **Negation:** `p∨¬p ≡ T` (tautology), `p∧¬p ≡ F` (contradiction)
+
+**กฎการอนุมาน (Rules of Inference) — ใช้สรุปโจทย์:**
+| กฎ | เงื่อนไข (Premises) | สรุป |
+|--|--|--|
+| **Modus Ponens** | p→q , p | ∴ q |
+| **Modus Tollens** | p→q , ¬q | ∴ ¬p |
+| **Hypothetical Syllogism** | p→q , q→r | ∴ p→r |
+| **Disjunctive Syllogism** | p∨q , ¬p | ∴ q |
+| Addition | p | ∴ p∨q |
+| Simplification | p∧q | ∴ p |
+
+- **นิเสธตัวบ่งปริมาณ:** `¬(∀x P(x)) ≡ ∃x ¬P(x)` ("ไม่ใช่ทุกตัว" = "มีบางตัวที่ไม่") · `¬(∃x P) ≡ ∀x ¬P`
+- **Syllogism (คำ):** "ทุก A เป็น B" + "ทุก B เป็น C" → "ทุก A เป็น C" · ⚠️ ระวังคำว่า **"บาง"** (some) สรุปเกินไม่ได้
+- **ตัวอย่างการใช้:** "ถ้าฝนตกแล้วถนนเปียก" + "ถนนไม่เปียก" → (Modus Tollens) **ฝนไม่ตก**
 
 ### 8.3 โจทย์คำนวณเร็ว
 - **อัตราการทำงานร่วม:** A เสร็จใน a, B ใน b → รวม `1/(1/a + 1/b) = ab/(a+b)` ชม.
