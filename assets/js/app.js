@@ -27,11 +27,6 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
 
-/* Hard "โหมดยาก" sets are playable as full sets but excluded from the
-   mix / category-drill pools so those modes keep their original difficulty. */
-const isHardSet = s => /ยาก/.test(s.set_name);
-const baseSets  = () => DATA.sets.filter(s => !isHardSet(s));
-
 function store(key, val) {
   try {
     if (val === undefined) { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; }
@@ -109,13 +104,12 @@ function buildFullSet(setId) {
 /* Mixed set: same per-category question-type counts as the blueprint,
    drawn from all 5 sets with duplicate question texts removed. */
 function buildMixSet() {
-  const src = baseSets();
-  const template = src[0].categories;
+  const template = DATA.sets[0].categories;
   const items = [];
   template.forEach((cat, ci) => {
     const pool = [];
     const seen = new Set();
-    src.forEach(s => s.categories[ci].questions.forEach(q => {
+    DATA.sets.forEach(s => s.categories[ci].questions.forEach(q => {
       const key = normWritten(q.question);
       if (seen.has(key)) return;
       seen.add(key);
@@ -127,14 +121,14 @@ function buildMixSet() {
       byType[type].slice(0, n).forEach(q => items.push(pack(q, cat.name)));
     });
   });
-  return { items, label: `สุ่มคละจากทั้ง ${baseSets().length} ชุด`, setId: null };
+  return { items, label: 'สุ่มคละจากทั้ง 5 ชุด', setId: null };
 }
 
 /* Category drill: unique questions of one category pulled from every set. */
 function buildCategorySet(catIndex, limit) {
   const name = DATA.sets[0].categories[catIndex].name;
   const seen = new Set(), pool = [];
-  baseSets().forEach(s => s.categories[catIndex].questions.forEach(q => {
+  DATA.sets.forEach(s => s.categories[catIndex].questions.forEach(q => {
     const key = normWritten(q.question);
     if (seen.has(key)) return;
     seen.add(key);
@@ -149,7 +143,7 @@ function buildCategorySet(catIndex, limit) {
 
 function countCategoryPool(catIndex) {
   const seen = new Set();
-  baseSets().forEach(s => s.categories[catIndex].questions.forEach(q => seen.add(normWritten(q.question))));
+  DATA.sets.forEach(s => s.categories[catIndex].questions.forEach(q => seen.add(normWritten(q.question))));
   return seen.size;
 }
 
@@ -344,9 +338,8 @@ function renderHome() {
   $('#setGrid').innerHTML = DATA.sets.map(s => {
     const n = s.categories.reduce((t, c) => t + c.questions.length, 0);
     const pts = s.categories.reduce((t, c) => t + c.points_total, 0);
-    const hard = isHardSet(s);
-    return `<button class="set-card${s.set_id === draft.setId ? ' is-on' : ''}${hard ? ' is-hard' : ''}" data-set="${s.set_id}" type="button" role="radio" aria-checked="${s.set_id === draft.setId}">
-      <b>${esc(s.set_name)}${hard ? ' <span class="set-badge set-badge--hard">ยาก</span>' : ''}</b>
+    return `<button class="set-card${s.set_id === draft.setId ? ' is-on' : ''}" data-set="${s.set_id}" type="button" role="radio" aria-checked="${s.set_id === draft.setId}">
+      <b>${esc(s.set_name)}</b>
       <span class="set-meta">${n} ข้อ · ${pts} คะแนน · 8 หมวด</span>
       ${doneSets.has(s.set_id) ? '<span class="set-badge">เคยทำแล้ว</span>' : ''}
     </button>`;

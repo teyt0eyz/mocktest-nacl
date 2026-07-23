@@ -183,10 +183,6 @@ code,pre,kbd{font-family:var(--mono)}
 .set-card b{font-size:1.05rem}
 .set-card .set-meta{font-size:.82rem;color:var(--muted)}
 .set-badge{align-self:flex-start;font-size:.72rem;font-weight:600;padding:.15rem .55rem;border-radius:999px;background:var(--ok-bg);color:var(--ok)}
-.set-badge--hard{display:inline-block;vertical-align:middle;margin-left:.4rem;background:#fee2e2;color:#b91c1c}
-.set-card.is-hard{border-color:#f3b4b4}
-.set-card.is-hard:hover{border-color:#e06666}
-.set-card.is-hard.is-on{border-color:#dc2626;background:#fef2f2;box-shadow:0 0 0 3px #fee2e2}
 
 .cat-list{display:grid;gap:.6rem}
 .cat-row{
