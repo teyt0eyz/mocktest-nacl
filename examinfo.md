@@ -84,7 +84,15 @@
 - **Universal gate:** NAND และ NOR สร้างเกตอื่นได้ทุกตัว
 - **ตัวเลขในดิจิทัล:** combinational (ผลขึ้นกับ input ปัจจุบัน) vs sequential (มี memory/สถานะ เช่น flip-flop)
 - **Flip-flop:** SR, D, JK, T — เก็บ 1 บิต · latch = level-triggered, flip-flop = edge-triggered
-- **De Morgan:** (A·B)' = A'+B' ; (A+B)' = A'·B'
+- **วงจร combinational สำคัญ:**
+  - **Half Adder:** Sum = A⊕B, Carry = A·B · **Full Adder:** บวก 3 บิต (A,B,Cin)
+  - **MUX (Multiplexer):** เลือก 1 จากหลาย input ด้วย n select line → รับได้ 2ⁿ input · **DEMUX** ตรงข้าม
+  - **Decoder:** n input → 2ⁿ output (เปิดทีละเส้น) · **Encoder** ตรงข้าม (2ⁿ→n)
+- **พีชคณิตบูลีน (ลดรูปวงจร):**
+  - Identity `A+0=A, A·1=A` · Null `A+1=1, A·0=0` · Idempotent `A+A=A, A·A=A`
+  - Complement `A+A'=1, A·A'=0` · Double `A''=A` · **Absorption** `A+A·B=A`, `A+A'·B=A+B`
+  - **De Morgan:** `(A·B)' = A'+B'` ; `(A+B)' = A'·B'`
+- **K-map:** ลดรูป SOP โดยจับกลุ่ม 1 ที่ติดกันเป็นกำลังของ 2 (1,2,4,8) ให้ใหญ่ที่สุด
 
 ### 1.2 ฮาร์ดแวร์ของคอมพิวเตอร์
 - **CPU** = ALU (คำนวณ) + CU (ควบคุม) + Register
@@ -141,6 +149,7 @@
 - **ฐาน 2 ↔ 8:** จับกลุ่มละ 3 บิต · **ฐาน 2 ↔ 16:** จับกลุ่มละ 4 บิต
 - **เศษส่วนฐานสอง:** `.101` = 1×2⁻¹ + 0×2⁻² + 1×2⁻³ = 0.5+0.125 = 0.625
 - ตัวอย่าง: `0xB7 = 1011 0111 = 267₈ = 183₁₀`
+- **รหัสอื่น:** **BCD** = เข้ารหัสทีละหลักฐานสิบเป็น 4 บิต (เช่น 45 → `0100 0101`) · **Gray code** = ต่างกันทีละ 1 บิตระหว่างค่าติดกัน · **ASCII** = 7 บิต, **Unicode/UTF-8** รองรับหลายภาษา
 
 ### 2.2 การดำเนินการทางคณิตศาสตร์ของเลขฐานสอง
 - **Two's complement (จำนวนติดลบ):** กลับบิตทุกตัว (one's complement) แล้ว **+1**
@@ -194,6 +203,18 @@
 - **อันตราย:** dangling pointer (ใช้หลัง free), null deref, memory leak (ลืม free), out-of-bounds
 - `malloc/calloc` (heap) → ต้อง `free` เอง · `sizeof(array) ≠ sizeof(pointer)`
 
+### 3.4 printf/scanf & Format Specifier (ช่วยอ่านข้อ "ทำนายผลลัพธ์")
+| Specifier | ชนิด | | Specifier | ชนิด |
+|--|--|--|--|--|
+| `%d` / `%i` | int | | `%x` / `%X` | hex |
+| `%u` | unsigned | | `%o` | octal |
+| `%f` | float/double | | `%c` | char (1 ตัว) |
+| `%e` | สัญกรณ์วิทย์ | | `%s` | string |
+| `%p` | pointer (address) | | `%%` | เครื่องหมาย % |
+- **Escape:** `\n` ขึ้นบรรทัด · `\t` แท็บ · `\0` null · `\\` backslash · `\"` อัญประกาศ
+- **ความกว้าง/ทศนิยม:** `%5d` (กว้าง 5), `%.2f` (ทศนิยม 2 ตำแหน่ง), `%-5d` (ชิดซ้าย)
+- ⚠️ พิมพ์ `char` ด้วย `%d` ได้ค่า ASCII (เช่น `'A'` → 65) · `scanf("%d",&x)` ต้องมี `&`
+
 ---
 
 ## หมวด 4 — คณิตศาสตร์ประยุกต์
@@ -235,6 +256,14 @@
 - ขั้นตอน: normalize → หา **covariance matrix** → หา **eigenvalue/eigenvector** → เรียง PC ตาม eigenvalue มาก→น้อย
 - **Principal Component ตัวแรก** = ทิศที่ข้อมูลกระจายมากที่สุด · PC ตั้งฉากกัน (orthogonal)
 
+### 4.6 เมทริกซ์ · ลอการิทึม · เซต (เครื่องมือช่วยคำนวณ)
+- **เมทริกซ์:** det 2×2 `[[a,b],[c,d]]` = `ad − bc` · คูณได้เมื่อ (m×n)·(n×p) = m×p · identity `I` (แนวทแยง=1)
+- **กฎลอการิทึม** (ใช้กับ Big-O/entropy): `log(xy)=log x+log y` · `log(x/y)=log x−log y` · `log(xⁿ)=n·log x` · `log_b x = log x / log b` · `log₂1024 = 10`
+- **การดำเนินการเซต:** `A∪B` (union), `A∩B` (intersection), `A−B` (ต่าง), `A'` (complement)
+  - **De Morgan (เซต):** `(A∪B)' = A'∩B'` · `(A∩B)' = A'∪B'`
+  - **Inclusion-Exclusion 3 เซต:** `|A∪B∪C| = |A|+|B|+|C| − |A∩B| − |A∩C| − |B∩C| + |A∩B∩C|`
+  - จำนวนสับเซตของเซตขนาด n = `2ⁿ`
+
 ---
 
 ## หมวด 5 — ระบบเครือข่าย
@@ -269,7 +298,11 @@
 | Firewall | L3-7 | กรองทราฟฟิก (stateful จำ session) |
 | Access Point | L2 | เชื่อม Wi-Fi เข้า LAN |
 - **VLAN:** แบ่ง broadcast domain เชิงตรรกะบนสวิตช์ · ข้าม VLAN ต้องผ่าน L3 (router-on-a-stick)
-- **สื่อ:** Twisted pair (Cat5e/6), Fiber (เร็ว ไกล ไม่โดนสัญญาณรบกวน), Coaxial
+- **สื่อ:** Twisted pair (Cat5e/6), Fiber (เร็ว ไกล ไม่โดนสัญญาณรบกวน — single-mode ไกลกว่า multi-mode), Coaxial
+- **สายทองแดง (จำ!):**
+  - **Straight-through** → เชื่อม **อุปกรณ์ต่างชนิด** (PC↔Switch, Switch↔Router)
+  - **Crossover** → เชื่อม **อุปกรณ์ชนิดเดียวกัน** (PC↔PC, Switch↔Switch, PC↔Router)
+  - **Rollover/Console** → ต่อพอร์ต console เพื่อตั้งค่าอุปกรณ์ · มาตรฐาน **T568A/T568B** · ปัจจุบันมี Auto-MDIX ปรับให้เอง
 
 ### 5.3 Wireless Network
 - **มาตรฐาน 802.11:** a/b/g/n (Wi-Fi 4) / ac (Wi-Fi 5) / ax (Wi-Fi 6) · ย่าน 2.4 GHz (ไกล ทะลุดี ช้า) vs 5 GHz (เร็ว ใกล้)
@@ -282,6 +315,7 @@
 - **พิเศษ:** Loopback `127.0.0.0/8` · APIPA/Link-local `169.254.0.0/16` · Default route `0.0.0.0` · Broadcast `255.255.255.255`
 - **IP Class:** A (1–126, /8) · B (128–191, /16) · C (192–223, /24) · D (224–239 multicast) · E (240–255 ทดลอง)
 - **IPv6:** 128 บิต, 8 กลุ่ม hex, ย่อศูนย์ด้วย `::` (ได้ครั้งเดียว) · loopback `::1` · link-local `fe80::/10`
+  - **ชนิด IPv6:** Unicast (เจาะจง 1 โหนด) · Multicast `ff00::/8` · Anycast (โหนดใกล้สุด) · **ไม่มี broadcast** · Global unicast `2000::/3`
 
 ### 5.5 การคำนวณ & แบ่ง Subnet (⭐ ออกแน่ + เขียนตอบ)
 **ขั้นตอนหา Network / Broadcast / Host range:**
@@ -300,9 +334,23 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
 
 **FLSM (Fixed-Length):** ทุก subnet ขนาดเท่ากัน — แบ่ง /24 เป็น 4 subnet ใช้ /26 (ยืม 2 บิต, 2²=4 วง วงละ 62 host)
 
+**⚡ Magic Number (คิดในหัวเร็ว):** magic = 256 − ค่า mask octet = block size → network address เป็นพหุคูณของ magic ที่ ≤ ค่า octet ของ IP
+- เช่น /26 → mask .192 → magic 64 → ขอบเขต 0, 64, 128, 192 · IP .130 → ตกในบล็อก 128
+
+**FLSM (Fixed-Length):** ทุก subnet ขนาดเท่ากัน — แบ่ง /24 เป็น 4 subnet ใช้ /26 (ยืม 2 บิต, 2²=4 วง วงละ 62 host)
+
 **VLSM (Variable-Length):** subnet ขนาดต่างกันตามจำนวน host — **จัดวงใหญ่ก่อน**
 - ต้องการ host N → host bits = ⌈log₂(N+2)⌉ → prefix = 32 − host bits
   - 50 host → ต้อง 6 บิต (64) → /26 · 100 host → 7 บิต (128) → /25 · 500 host → 9 บิต → /23
+- **ตัวอย่าง VLSM เต็ม:** แบ่ง `192.168.1.0/24` ให้ A=100, B=50, C=25, D=2 (WAN)
+
+| แผนก | host | prefix | ช่วง network |
+|--|--|--|--|
+| A (100) | ≥126 | /25 | 192.168.1.0 – .127 |
+| B (50) | ≥62 | /26 | 192.168.1.128 – .191 |
+| C (25) | ≥30 | /27 | 192.168.1.192 – .223 |
+| D (2) | ≥2 | /30 | 192.168.1.224 – .227 |
+
 - **Route summarization (supernet):** รวมหลาย network เป็น prefix เดียว
   - `192.168.4.0/24 – .7.0/24` (4 วงต่อเนื่อง) → `192.168.4.0/22`
 
@@ -311,16 +359,33 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
 - **Static NAT** (1:1) · **Dynamic NAT** (pool) · **PAT/NAT Overload** (หลายเครื่องใช้ 1 public IP แยกด้วย port — พบบ่อยสุด)
 - **SNAT** (แก้ต้นทาง, ขาออก) vs **DNAT** (แก้ปลายทาง, port forwarding เข้ามา)
 
-### 5.7 Routing Protocol
-| Protocol | ชนิด | Metric | AD |
-|--|--|--|--|
-| RIP | Distance Vector | hop count (max 15) | 120 |
-| OSPF | Link State | cost (=1/bandwidth) | 110 |
-| EIGRP | Hybrid (Cisco) | bandwidth+delay | 90 |
-| BGP | Path Vector | AS-path (ระหว่าง AS) | 20/200 |
-- **Static** (AD 1) vs **Dynamic** · **Directly connected** AD 0
-- **Distance Vector** (บอกเพื่อนบ้านทั้งตาราง เช่น RIP — เสี่ยง loop, ใช้ split horizon) vs **Link State** (รู้ topology ทั้งหมด เช่น OSPF ใช้ Dijkstra)
-- **Longest prefix match:** router เลือกเส้นทางที่ prefix ยาวสุด · **Default gateway** = `0.0.0.0/0`
+### 5.7 Routing Protocol (⭐ RIP vs OSPF vs BGP)
+| Protocol | ชนิด | Metric | AD | ขอบเขต | หมายเหตุ |
+|--|--|--|--|--|--|
+| **RIP** | Distance Vector | hop count (max **15**, 16=ไปไม่ถึง) | **120** | ภายใน (IGP) เล็ก | ง่าย แต่ช้า/สเกลไม่ดี |
+| **OSPF** | Link State | **cost** = 10⁸/bandwidth | **110** | ภายใน (IGP) กลาง-ใหญ่ | open standard, เร็ว |
+| **EIGRP** | Advanced DV (Cisco) | bandwidth+delay | **90** (in) /170 (ext) | ภายใน (IGP) | ของ Cisco, DUAL |
+| **BGP** | Path Vector | AS-path + policy | **eBGP 20 / iBGP 200** | ระหว่าง AS (EGP) | โปรโตคอลของอินเทอร์เน็ต, TCP/179 |
+
+**ทำงานอย่างไร:**
+- **RIP** — แต่ละ router **ส่งตารางเส้นทางทั้งหมดให้เพื่อนบ้าน**ทุก 30 วิ, วัดระยะด้วยจำนวน hop, เลือกเส้นที่ hop น้อยสุด · convergence ช้า, เสี่ยง loop → กันด้วย **split horizon, poison reverse, hold-down timer** · RIPv2 รองรับ VLSM (classless)
+- **OSPF** — แต่ละ router **รู้ topology ทั้งหมด** (แลก LSA + hello), คำนวณเส้นสั้นสุดด้วย **Dijkstra (SPF)**, แบ่งเป็น **area** (area 0 = backbone) · convergence เร็ว, สเกลดี · เลือกเส้นที่ **cost รวมต่ำสุด** (cost แปรผกผันกับ bandwidth)
+- **BGP** — ใช้**ระหว่าง Autonomous System** (เชื่อมอินเทอร์เน็ต), ตัดสินด้วย **AS-path** ที่สั้นสุด + นโยบาย (attribute) · เชื่อถือได้ผ่าน TCP/179, สเกลใหญ่มากแต่ convergence ช้า
+
+**Administrative Distance (AD) — "ความน่าเชื่อถือ, ยิ่งน้อยยิ่งได้สิทธิ์ก่อน":**
+
+| แหล่งเส้นทาง | AD | | แหล่งเส้นทาง | AD |
+|--|--|--|--|--|
+| Connected (ต่อตรง) | **0** | | OSPF | 110 |
+| Static | **1** | | IS-IS | 115 |
+| eBGP | 20 | | RIP | 120 |
+| EIGRP (internal) | 90 | | EIGRP (external) | 170 |
+| | | | iBGP | 200 · Unknown 255 |
+
+- **ลำดับการเลือกเส้นทางของ router:** ① **Longest Prefix Match** (prefix ยาวสุดชนะก่อนเสมอ) → ② ถ้า prefix เท่ากันเลือก **AD ต่ำสุด** → ③ ถ้าโปรโตคอลเดียวกันเลือก **metric ต่ำสุด**
+- 🔑 เช่น เส้นทางเดียวกันมาจาก OSPF (AD 110) และ RIP (AD 120) → router เชื่อ **OSPF** · Static (1) ชนะทั้งคู่
+- **Static** (ตั้งมือ) vs **Dynamic** (โปรโตคอลเรียนรู้เอง) · **Default gateway/route** = `0.0.0.0/0` (ใช้เมื่อไม่ตรงเส้นอื่น)
+- **IGP** (ภายใน AS: RIP/OSPF/EIGRP) vs **EGP** (ระหว่าง AS: BGP)
 
 ### 5.8 Application Layer Protocol & พอร์ต
 | Port | Protocol | | Port | Protocol |
@@ -339,7 +404,9 @@ Network `110.58.64.0` · Broadcast `110.58.79.255` · Host `110.58.64.1 – 110.
 - **DHCP DORA:** Discover → Offer → Request → Acknowledge
 - **TCP vs UDP:** TCP = เชื่อถือได้, มี handshake, จัดลำดับ, flow/congestion control (HTTP, SSH, FTP) · UDP = เร็ว ไม่รับประกัน (DNS, VoIP, streaming, DHCP)
 - **TCP 3-way handshake:** SYN → SYN-ACK → ACK · ปิด 4-way (FIN/ACK)
-- **TCP flags:** SYN, ACK, FIN, RST, PSH, URG
+- **TCP flags:** **SYN** (เริ่มเชื่อมต่อ) · **ACK** (ยืนยัน) · **FIN** (ขอปิด) · **RST** (รีเซ็ต/ปฏิเสธ) · **PSH** (ส่งทันที) · **URG** (ด่วน)
+- **TCP header (ฟิลด์สำคัญ):** Source/Dest Port, Sequence #, Acknowledgment #, Flags, Window size (flow control), Checksum · **UDP header** เล็กกว่า (มีแค่ port, length, checksum — ไม่มี seq/ack)
+- **ICMP types (วินิจฉัยเครือข่าย):** Echo Request(8)/Reply(0) = **ping** · Destination Unreachable(3) · Time Exceeded(11) = **traceroute/TTL หมด** · Redirect(5)
 
 ### 5.9 HTTP Method & Status Code
 **Methods:**
@@ -440,6 +507,19 @@ Router(config-if)# ip access-group 100 in
 - **EtherChannel:** รวมหลายลิงก์เป็นลิงก์ตรรกะเดียว (เพิ่ม bandwidth + redundancy)
 - **DHCP บน router:** `ip dhcp pool <name>` → `network`, `default-router`, `dns-server`
 - **Password:** `enable secret <pw>` (เข้ารหัส), `line vty 0 4` + `login`/`transport input ssh` (รีโมต SSH)
+
+### 5.12 มาตรฐาน IEEE 802 ที่เกี่ยวกับเครือข่าย (จำกลุ่มหลัก)
+| มาตรฐาน | เรื่อง | รายละเอียด |
+|--|--|--|
+| **802.1** | Bridging/Architecture | **802.1Q** = VLAN tagging (trunk) · **802.1D** = STP (กัน loop) · **802.1w** = RSTP (เร็วขึ้น) · **802.1X** = port-based authentication (NAC) |
+| **802.2** | LLC | Logical Link Control (ชั้นย่อยบนของ Data Link) |
+| **802.3** | **Ethernet (มีสาย)** | 802.3u = Fast Ethernet 100 Mbps · 802.3ab = Gigabit (copper) · 802.3ae = 10 GbE · **802.3af/at = PoE / PoE+** (จ่ายไฟผ่านสาย LAN) |
+| **802.5** | Token Ring | (เก่า/เลิกใช้แล้ว) |
+| **802.11** | **Wi-Fi (ไร้สาย)** | b/g (2.4G) · a (5G) · n=Wi-Fi 4 · ac=Wi-Fi 5 · ax=Wi-Fi 6 · **802.11i** = WPA2 security |
+| **802.15** | WPAN (ระยะสั้น) | **802.15.1 = Bluetooth** · **802.15.4 = Zigbee** |
+| **802.16** | WiMAX | บรอดแบนด์ไร้สายระยะไกล |
+
+- 🔑 จำแกน: **802.3 = สาย (Ethernet)** · **802.11 = ไร้สาย (Wi-Fi)** · **802.1Q = VLAN** · **802.1X = auth** · **802.15.1 = Bluetooth**
 
 ---
 
@@ -619,6 +699,15 @@ Router(config-if)# ip access-group 100 in
 - **%:** เพิ่ม 10% แล้วลด 10% = ×1.1×0.9 = 0.99 (ลดสุทธิ 1%)
 - **สามเหลี่ยมมุมฉาก 3-4-5, 5-12-13** (Pythagorean)
 - **ปัญหากับดัก:** "แซงที่ 2 = ได้ที่ 2" · "ตี n ครั้ง มี n−1 ช่วง"
+
+### 8.4 ประเภทโจทย์เชาว์ที่พบบ่อย (จำวิธี)
+- **มุมเข็มนาฬิกา:** `|30·H − 5.5·M|` องศา (ถ้า >180 ใช้ 360 − ค่านั้น) · เช่น 3:00 = 90°
+- **Coding-Decoding:** แทนตัวอักษรด้วยเลข (A=1…Z=26) หรือเลื่อนตำแหน่ง เช่น +1: CAT→DBU
+- **Direction Sense (ทิศทาง):** วาดเส้นทาง แล้วใช้พีทาโกรัสหาระยะตรงจากจุดเริ่ม
+- **Blood Relations (เครือญาติ):** วาดผังครอบครัว · "ลูกชายของพ่อฉัน" = พี่/น้องชาย
+- **Calendar (ปฏิทิน):** 1 ปีปกติ = 52 สัปดาห์ + 1 วัน (odd day) · ปีอธิกสุรทิน +2 วัน
+- **Venn Diagram:** ใช้ inclusion-exclusion นับจำนวนแต่ละส่วน (เรียนกี่วิชา/ชอบกี่อย่าง)
+- **Analogy (อุปมา):** หาความสัมพันธ์ A:B แล้วเทียบ C:? · **Odd one out:** หาตัวที่ต่างกลุ่ม
 
 ---
 
