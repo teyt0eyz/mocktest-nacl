@@ -884,32 +884,32 @@
             {
               "id": "Q0054",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "หากแบ่ง Subnet จาก /23 เป็น /30 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ต้องส่งไฟล์ขนาด 750 MB ผ่านลิงก์ความเร็ว 250 Mbps (สมมติไม่มี overhead) จะใช้เวลากี่วินาที",
               "options": [
-                "7",
-                "64",
-                "128",
-                "129",
-                "256"
+                "3",
+                "12",
+                "48",
+                "24",
+                "96"
               ],
-              "answer": 2,
-              "explanation": "2^(30-23) = 128"
+              "answer": 3,
+              "explanation": "เวลา = ขนาด(bit)/bandwidth = 750×8 / 250 = 24 วินาที (1 Byte = 8 bit)"
             },
             {
               "id": "Q0055",
               "type": "mc",
-              "subtopic": "การคำนวณและการแบ่ง Subnet",
-              "question": "หากแบ่ง Subnet จาก /24 เป็น /28 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ลิงก์ 100 Mbps ใช้งานได้จริงที่ประสิทธิภาพ 90% (ที่เหลือเป็น overhead) throughput ที่ได้จริงกี่ Mbps",
               "options": [
-                "16",
-                "4",
-                "8",
-                "32",
-                "12"
+                "10.0",
+                "45",
+                "140",
+                "100",
+                "90"
               ],
-              "answer": 0,
-              "explanation": "คำนวณจาก /28 → host bits = 4"
+              "answer": 4,
+              "explanation": "effective = 100 × 0.9 = 90 Mbps"
             },
             {
               "id": "Q0056",
@@ -2826,17 +2826,17 @@
             {
               "id": "Q0177",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "เครือข่ายที่มี Subnet Mask /22 รองรับจำนวน Host ที่ใช้งานได้จริงสูงสุดกี่เครื่อง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ต้องส่งไฟล์ขนาด 1000 MB ผ่านลิงก์ความเร็ว 500 Mbps (สมมติไม่มี overhead) จะใช้เวลากี่วินาที",
               "options": [
-                "1023",
-                "1021",
-                "1022",
-                "2046",
-                "1024"
+                "64",
+                "8",
+                "16",
+                "32",
+                "2"
               ],
               "answer": 2,
-              "explanation": "2^(32-22) - 2 = 1022"
+              "explanation": "เวลา = ขนาด(bit)/bandwidth = 1000×8 / 500 = 16 วินาที (1 Byte = 8 bit)"
             },
             {
               "id": "Q0178",
@@ -2892,17 +2892,17 @@
             {
               "id": "Q0181",
               "type": "mc",
-              "subtopic": "การคำนวณและการแบ่ง Subnet",
-              "question": "เครือข่ายที่มี Subnet Mask /23 สามารถรองรับจำนวน Host ที่ใช้งานได้จริงสูงสุดกี่เครื่อง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ในเวลา 5 วินาที ลิงก์ความเร็ว 80 Mbps ส่งข้อมูลได้กี่ MB",
               "options": [
-                "508",
-                "513",
-                "512",
-                "510",
-                "511"
+                "400",
+                "25",
+                "100",
+                "60",
+                "50"
               ],
-              "answer": 3,
-              "explanation": "คำนวณจาก /23 → host bits = 9"
+              "answer": 4,
+              "explanation": "ข้อมูล = 80×5/8 = 50 MB"
             },
             {
               "id": "Q0182",
@@ -4743,17 +4743,17 @@
             {
               "id": "Q0299",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "เครือข่ายที่มี Subnet Mask /18 รองรับจำนวน Host ที่ใช้งานได้จริงสูงสุดกี่เครื่อง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ลิงก์ 500 Mbps ใช้งานได้จริงที่ประสิทธิภาพ 60% (ที่เหลือเป็น overhead) throughput ที่ได้จริงกี่ Mbps",
               "options": [
-                "16384",
-                "16381",
-                "16383",
-                "32766",
-                "16382"
+                "150",
+                "500",
+                "300",
+                "350",
+                "200"
               ],
-              "answer": 4,
-              "explanation": "2^(32-18) - 2 = 16382"
+              "answer": 2,
+              "explanation": "effective = 500 × 0.6 = 300 Mbps"
             },
             {
               "id": "Q0300",
@@ -4825,17 +4825,17 @@
             {
               "id": "Q0305",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "หากแบ่ง Subnet จาก /25 เป็น /28 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ลิงก์ 1000 Mbps มี RTT 10 ms ค่า Bandwidth-Delay Product (ปริมาณข้อมูลที่กำลังเดินทาง) ประมาณกี่ KB (กำหนด 1 KB = 1000 byte)",
               "options": [
-                "8",
-                "4",
-                "9",
-                "3",
-                "16"
+                "5000",
+                "2500",
+                "10000",
+                "1250",
+                "625"
               ],
-              "answer": 0,
-              "explanation": "2^(28-25) = 8"
+              "answer": 3,
+              "explanation": "BDP = 1000 Mbps × 10 ms = 10000000 bit = 1250000 byte ≈ 1250 KB"
             },
             {
               "id": "Q0306",
@@ -6955,17 +6955,17 @@
             {
               "id": "Q0439",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "หากแบ่ง Subnet จาก /20 เป็น /23 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ต้องส่งไฟล์ขนาด 500 MB ผ่านลิงก์ความเร็ว 100 Mbps (สมมติไม่มี overhead) จะใช้เวลากี่วินาที",
               "options": [
-                "4",
-                "3",
-                "16",
-                "9",
-                "8"
+                "5",
+                "160",
+                "20",
+                "80",
+                "40"
               ],
               "answer": 4,
-              "explanation": "2^(23-20) = 8"
+              "explanation": "เวลา = ขนาด(bit)/bandwidth = 500×8 / 100 = 40 วินาที (1 Byte = 8 bit)"
             },
             {
               "id": "Q0440",
@@ -7061,17 +7061,17 @@
             {
               "id": "Q0446",
               "type": "mc",
-              "subtopic": "การคำนวณและการแบ่ง Subnet",
-              "question": "หากแบ่ง Subnet จาก /24 เป็น /26 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ข้อมูลเดินทางผ่าน 3 ลิงก์ต่อกันความเร็ว 1000, 100, 500 Mbps throughput สูงสุดที่เป็นไปได้ (คอขวด) เท่ากับกี่ Mbps",
               "options": [
-                "2",
-                "5",
-                "3",
-                "8",
-                "4"
+                "1600",
+                "533",
+                "200",
+                "100",
+                "1000"
               ],
-              "answer": 4,
-              "explanation": "คำนวณจาก /26 → host bits = 6"
+              "answer": 3,
+              "explanation": "throughput ถูกจำกัดโดยลิงก์ที่ช้าที่สุด (bottleneck) = 100 Mbps"
             },
             {
               "id": "Q0447",
@@ -9033,17 +9033,17 @@
             {
               "id": "Q0572",
               "type": "mc",
-              "subtopic": "การคำนวณและการแบ่ง Subnet",
-              "question": "เครือข่ายที่มี Subnet Mask /29 สามารถรองรับจำนวน Host ที่ใช้งานได้จริงสูงสุดกี่เครื่อง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ข้อมูลเดินทางผ่าน 3 ลิงก์ต่อกันความเร็ว 500, 50, 200 Mbps throughput สูงสุดที่เป็นไปได้ (คอขวด) เท่ากับกี่ Mbps",
               "options": [
-                "8",
-                "0",
-                "4",
-                "3",
-                "6"
+                "750",
+                "50",
+                "250",
+                "100",
+                "500"
               ],
-              "answer": 4,
-              "explanation": "คำนวณจาก /29 → host bits = 3"
+              "answer": 1,
+              "explanation": "throughput ถูกจำกัดโดยลิงก์ที่ช้าที่สุด (bottleneck) = 50 Mbps"
             },
             {
               "id": "Q0573",
@@ -9086,17 +9086,17 @@
             {
               "id": "Q0575",
               "type": "mc",
-              "subtopic": "Subnetting",
-              "question": "หากแบ่ง Subnet จาก /17 เป็น /24 จะได้ Subnet ทั้งหมดกี่วง",
+              "subtopic": "คำนวณ Network Performance (Throughput/BDP)",
+              "question": "ต้องส่งไฟล์ขนาด 5 MB ผ่านลิงก์ความเร็ว 10 Mbps (สมมติไม่มี overhead) จะใช้เวลากี่วินาที",
               "options": [
-                "256",
-                "64",
-                "7",
-                "128",
-                "129"
+                "8",
+                "4",
+                "16",
+                "0.5",
+                "2"
               ],
-              "answer": 3,
-              "explanation": "2^(24-17) = 128"
+              "answer": 1,
+              "explanation": "เวลา = ขนาด(bit)/bandwidth = 5×8 / 10 = 4 วินาที (1 Byte = 8 bit)"
             },
             {
               "id": "Q0576",
