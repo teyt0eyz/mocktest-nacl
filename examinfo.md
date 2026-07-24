@@ -110,6 +110,22 @@
 - **หลักการ:** Least Privilege, Defense in Depth, Zero Trust (never trust, always verify), MFA
 - **Malware:** Virus (ต้องพาหะ), Worm (แพร่เอง), Trojan (ปลอมตัว), Rootkit, Spyware
 
+**ไทม์ไลน์เหตุการณ์ไซเบอร์สำคัญ (ออกในข้อสอบ):**
+| ปี | เหตุการณ์ | จำไว้ |
+|--|--|--|
+| 1971 | **Creeper** | ไวรัสคอมพิวเตอร์ตัวแรก (เชิงทดลอง บน ARPANET) |
+| 1988 | **Morris Worm** | worm ตัวแรกที่แพร่วงกว้างบนอินเทอร์เน็ต |
+| 1999 | Melissa | macro virus ในเอกสาร Word แพร่ผ่านอีเมล |
+| 2000 | **ILOVEYOU** | หนอนอีเมลไฟล์แนบ สร้างความเสียหายทั่วโลก |
+| 2010 | **Stuxnet** | โจมตี SCADA/PLC โครงการนิวเคลียร์อิหร่าน |
+| 2014 | Heartbleed | ช่องโหว่ใน **OpenSSL** |
+| 2016 | **Mirai** | botnet จากอุปกรณ์ IoT → DDoS ขนาดใหญ่ |
+| 2017 | **WannaCry** | ransomware ใช้ช่องโหว่ **EternalBlue (SMB)** |
+| 2017 | NotPetya / Equifax | wiper ปลอมเป็น ransomware / ข้อมูลรั่วเพราะไม่แพตช์ Apache Struts |
+| 2020 | **SolarWinds** | supply chain attack (ฝังโค้ดในอัปเดต) |
+| 2021 | **Log4Shell** / Colonial Pipeline | RCE ในไลบรารี **Log4j** / ท่อน้ำมันหยุดเพราะ ransomware |
+- **บุคคล/ของสำคัญ:** Alan Turing (ถอดรหัส Enigma WWII) · Kevin Mitnick (แฮกเกอร์ social engineering) · Trojan ตั้งชื่อตามม้าไม้เมืองทรอย
+
 ### 1.4 ระบบปฏิบัติการ (OS)
 - **หน้าที่:** จัดการ process, memory, file system, I/O, ความปลอดภัย
 - **Process vs Thread:** process แยก memory · thread แชร์ memory ใน process เดียว (เบากว่า ระวัง race condition)
