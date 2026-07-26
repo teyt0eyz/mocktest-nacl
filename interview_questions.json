@@ -561,6 +561,208 @@
         "command > out.log 2>&1 → เก็บทั้ง stdout+stderr ลงไฟล์เดียว",
         "command 2>&1 | tee log → ดูบนจอพร้อมบันทึกไฟล์"
       ]
+    },
+
+    {
+      "id": "NET-21", "category": "network",
+      "q": "ออกแบบเครือข่ายสำนักงานเล็กที่มี 3 แผนก (Sales, Engineer, Guest) ให้แยกจากกันและปลอดภัย คุณจะวางโครงสร้างอย่างไร",
+      "points": [
+        "แยกแต่ละแผนกเป็น VLAN คนละวง (แยก broadcast domain + ความปลอดภัย) เช่น VLAN10/20/30",
+        "แบ่ง subnet ให้แต่ละ VLAN, ตั้ง default gateway ที่ L3 switch/router (inter-VLAN routing / router-on-a-stick)",
+        "DHCP แจก IP แต่ละ VLAN, ใช้ ACL จำกัดการเข้าถึงระหว่างแผนก (เช่น Guest เข้าเน็ตได้แต่เข้า internal ไม่ได้)",
+        "ขาออกผ่าน firewall/NAT, มี Wi-Fi แยก SSID ต่อ VLAN, พิจารณา redundancy ของ gateway/uplink"
+      ]
+    },
+    {
+      "id": "NET-22", "category": "network",
+      "q": "ได้ IP block 192.168.1.0/24 มา ต้องแบ่งให้ Sales 100 เครื่อง, Engineer 50, Guest 20, และ WAN link 2 จะวางแผน subnet (VLSM) อย่างไร",
+      "points": [
+        "จัดวงใหญ่ก่อน (VLSM): Sales 100 → /25 (126 host) = 192.168.1.0/25 (.0–.127)",
+        "Engineer 50 → /26 (62 host) = 192.168.1.128/26 (.128–.191)",
+        "Guest 20 → /27 (30 host) = 192.168.1.192/27 (.192–.223)",
+        "WAN link 2 → /30 (2 host) = 192.168.1.224/30; เหลือช่วงไว้ขยายอนาคต"
+      ]
+    },
+    {
+      "id": "NET-23", "category": "network",
+      "q": "สาขาต่างจังหวัดแจ้งว่าเชื่อมต่อสำนักงานใหญ่ (HQ) ไม่ได้ แต่ในสาขาใช้เน็ตได้ปกติ คุณจะไล่หาสาเหตุอย่างไร",
+      "points": [
+        "ยืนยันขอบเขต: ในสาขาปกติ = ปัญหาอยู่ที่เส้นทางไป HQ (WAN/VPN/routing)",
+        "ตรวจ WAN link/VPN tunnel ขึ้นไหม (site-to-site VPN, IPsec), ping gateway ฝั่ง WAN",
+        "ตรวจ routing: มี route ไป subnet ของ HQ ไหม, ตรวจ ACL/firewall ที่อาจบล็อก",
+        "traceroute หา hop ที่ขาด, ตรวจ DNS ถ้าเข้าด้วยชื่อ, ตรวจ overlap subnet สองฝั่ง"
+      ]
+    },
+    {
+      "id": "NET-24", "category": "network",
+      "q": "เว็บเซิร์ฟเวอร์ที่วางไว้ภายในองค์กร เข้าจากในวงได้ แต่เข้าจากอินเทอร์เน็ตไม่ได้ ปัญหาน่าจะอยู่ที่ไหน",
+      "points": [
+        "ต้องมี public IP + NAT/port forwarding (map public:443 → private server) ที่ router/firewall",
+        "ตรวจ firewall rule เปิดพอร์ต 80/443 ขาเข้า, security group/ACL",
+        "ตรวจ DNS record (A record ชี้ public IP ถูกไหม), default gateway ของเซิร์ฟเวอร์",
+        "ทดสอบจากภายนอกจริง (mobile data), พิจารณาวางใน DMZ เพื่อความปลอดภัย"
+      ]
+    },
+    {
+      "id": "NET-25", "category": "network",
+      "q": "ผู้ใช้บ่นว่าเครือข่ายช้าและหลุดเป็นช่วง ๆ (packet loss) จะวินิจฉัยและหาสาเหตุอย่างไร",
+      "points": [
+        "ping/mtr ต่อเนื่องดู latency/loss, ระบุว่าเกิดเฉพาะปลายทางเดียวหรือทั้งวง",
+        "สาเหตุที่พบบ่อย: congestion/แบนด์วิดท์เต็ม, duplex mismatch, สาย/พอร์ตเสีย, สัญญาณ Wi-Fi",
+        "ตรวจ broadcast storm / loop (STP ทำงานไหม), CPU/หน่วยความจำอุปกรณ์, error counter บนพอร์ต (show interface)",
+        "ตรวจ MTU/fragmentation, QoS; แก้ตามต้นเหตุ (เปลี่ยนสาย, เปิด STP, เพิ่ม bandwidth)"
+      ]
+    },
+    {
+      "id": "NET-26", "category": "network",
+      "q": "จะออกแบบเครือข่ายให้ไม่มีจุดล้มเหลวจุดเดียว (redundancy / high availability) ได้อย่างไร",
+      "points": [
+        "อุปกรณ์/ลิงก์สำรอง: dual uplink, redundant switch/router, dual power",
+        "L2: STP/RSTP กัน loop เมื่อมีหลายเส้น, EtherChannel รวมลิงก์เพิ่ม bandwidth+สำรอง",
+        "L3 gateway redundancy: HSRP/VRRP (virtual gateway หลาย router สำรองกัน)",
+        "WAN สองผู้ให้บริการ (dual ISP) + failover routing, ออกแบบ N+1"
+      ]
+    },
+    {
+      "id": "NET-27", "category": "network",
+      "q": "สองเครื่องอยู่ subnet เดียวกันแต่ ping หากันไม่เจอ จะเป็นเพราะอะไรได้บ้าง",
+      "points": [
+        "อยู่คนละ VLAN แม้ subnet เดียวกัน, หรือพอร์ตสวิตช์ผิด VLAN/ปิดอยู่",
+        "IP ซ้ำ (duplicate IP), subnet mask ตั้งผิด, firewall ในเครื่อง (Windows firewall block ICMP)",
+        "ปัญหา L2: สาย/พอร์ตเสีย, ARP ไม่ resolve, port security บล็อก MAC",
+        "ตรวจด้วย arp -a, ตรวจ VLAN ของพอร์ต, ปิด firewall ทดสอบ"
+      ]
+    },
+    {
+      "id": "NET-28", "category": "network",
+      "q": "จะออกแบบการแบ่งโซนเครือข่าย (network segmentation) เพื่อความปลอดภัยอย่างไร เช่น DMZ",
+      "points": [
+        "แบ่งโซนตามระดับความเชื่อถือ: Public/Internet → DMZ (เซิร์ฟเวอร์สาธารณะ web/mail) → Internal → Management",
+        "วาง firewall กั้นระหว่างโซน, กำหนดกฎอนุญาตเฉพาะที่จำเป็น (least privilege)",
+        "DMZ ไม่ให้เข้าถึง internal โดยตรง; DB อยู่วงในสุดไม่เปิด public",
+        "แยก VLAN, ใช้ jump host/bastion เข้าถึง management, micro-segmentation ในองค์กรใหญ่"
+      ]
+    },
+    {
+      "id": "NET-29", "category": "network",
+      "q": "เครื่องใหม่เสียบเข้าเครือข่ายแล้วไม่ได้รับ IP จาก DHCP จะไล่ปัญหาอย่างไร",
+      "points": [
+        "ตรวจ link/พอร์ต up ไหม, อยู่ VLAN ที่มี DHCP ไหม",
+        "DHCP scope เต็ม (pool หมด) หรือ DHCP server ล่ม",
+        "ข้ามวง: ต้องมี DHCP relay (ip helper-address) ชี้ไป DHCP server",
+        "ทดสอบตั้ง static IP ดูว่าวงใช้ได้ไหม, ดู log ที่ DHCP server, ตรวจ port security"
+      ]
+    },
+    {
+      "id": "NET-30", "category": "network",
+      "q": "องค์กรมีหลายสาขาต้องเชื่อมเข้าสำนักงานใหญ่อย่างปลอดภัย จะออกแบบการเชื่อมต่ออย่างไร",
+      "points": [
+        "Site-to-site VPN (IPsec) ผ่านอินเทอร์เน็ต — ประหยัด, เข้ารหัส",
+        "MPLS — เสถียร/มี SLA แต่แพง; SD-WAN — บริหารหลายลิงก์+นโยบายรวมศูนย์, failover อัตโนมัติ",
+        "วางแผน IP ไม่ให้ subnet ซ้ำกันระหว่างสาขา, routing (static/dynamic) ระหว่าง site",
+        "พิจารณา redundant link, QoS สำหรับ VoIP, และ central firewall/monitoring"
+      ]
+    },
+
+    {
+      "id": "CLD-21", "category": "cloud",
+      "q": "ออกแบบสถาปัตยกรรมเว็บแอปแบบ 3-tier บนคลาวด์ที่รองรับผู้ใช้จำนวนมาก คุณจะวางโครงสร้างอย่างไร",
+      "points": [
+        "Presentation: CDN (static) + DNS; ทราฟฟิกเข้า Load Balancer",
+        "Application tier: หลายอินสแตนซ์ stateless + auto-scaling (กระจายหลาย AZ)",
+        "Data tier: managed DB (primary + read replicas), cache (Redis) ลดโหลด DB",
+        "งานหนัก async ผ่าน message queue + worker; เพิ่ม monitoring/logging + backup/DR"
+      ]
+    },
+    {
+      "id": "CLD-22", "category": "cloud",
+      "q": "ระบบต้องรองรับทราฟฟิกพุ่งกะทันหัน (เช่น flash sale) จะออกแบบอย่างไรไม่ให้ล่ม",
+      "points": [
+        "Auto-scaling ตาม metric + pre-warm/scheduled scaling ก่อนช่วงพีค",
+        "CDN + caching หนัก ๆ ลดโหลด origin; ใช้ queue รับ order แล้วประมวลผล async (บัฟเฟอร์)",
+        "Rate limiting / throttling + graceful degradation (ตัดฟีเจอร์รองเมื่อโหลดสูง)",
+        "แยก stateless, DB ใช้ read replica/คิว; load test ก่อนงานจริง"
+      ]
+    },
+    {
+      "id": "CLD-23", "category": "cloud",
+      "q": "จะออกแบบระบบให้พร้อมใช้งานสูงข้ามภูมิภาค (multi-region HA / DR) อย่างไร",
+      "points": [
+        "กระจายหลาย region: active-active (โหลดจริงทั้งคู่) หรือ active-passive (สำรองรอ failover)",
+        "DNS failover / global load balancer (health check → สลับ region ที่ล่ม)",
+        "จำลองข้อมูลข้าม region (DB replication), ระวัง consistency (CAP) และ latency",
+        "กำหนด RTO/RPO ให้ชัด, ทดสอบ failover สม่ำเสมอ (DR drill)"
+      ]
+    },
+    {
+      "id": "CLD-24", "category": "cloud",
+      "q": "องค์กรมีระบบ on-premise ต้องการย้ายขึ้นคลาวด์ คุณจะวางแผน migration อย่างไร",
+      "points": [
+        "ประเมิน (assessment): inventory แอป/ข้อมูล/dependency + จัดลำดับความสำคัญ",
+        "เลือกกลยุทธ์ 6R: Rehost (lift-and-shift), Replatform, Refactor, Repurchase, Retire, Retain",
+        "ย้ายเป็นเฟส เริ่มจากแอปความเสี่ยงต่ำ, ทำ hybrid ระหว่างเปลี่ยนผ่าน (VPN/Direct Connect)",
+        "วางแผนข้อมูล (migration + sync), ทดสอบ, rollback plan, ปรับ cost/security หลังย้าย"
+      ]
+    },
+    {
+      "id": "CLD-25", "category": "cloud",
+      "q": "ค่าใช้จ่ายคลาวด์สูงเกินไป จะออกแบบ/ปรับให้ประหยัด (cost optimization) อย่างไร",
+      "points": [
+        "Right-sizing (ลดสเปกที่ใช้เกิน) + auto-scale down/ปิดทรัพยากรที่ไม่ใช้ (dev ตอนกลางคืน)",
+        "เลือก pricing ให้เหมาะ: Reserved/Savings Plan (โหลดคงที่), Spot (งาน fault-tolerant)",
+        "Serverless สำหรับงานเป็นครั้งคราว (จ่ายตามใช้), storage tiering (ย้ายข้อมูลเก่าไป cold/archive)",
+        "ตั้ง budget/alert + tagging ติดตามต้นทุนต่อทีม/บริการ, ลด data egress"
+      ]
+    },
+    {
+      "id": "CLD-26", "category": "cloud",
+      "q": "จะออกแบบแพลตฟอร์ม CI/CD + container สำหรับทีมพัฒนาอย่างไร",
+      "points": [
+        "Pipeline: commit → build → test → build image → push registry → deploy (GitHub Actions/GitLab CI)",
+        "รันบน Kubernetes; จัดการ config/secret แยก, ใช้ IaC (Terraform) provision infra",
+        "Deploy ปลอดภัย: blue-green / canary + rollback อัตโนมัติเมื่อ health check ไม่ผ่าน",
+        "เพิ่ม observability (logging/metrics/tracing), security scan image ใน pipeline"
+      ]
+    },
+    {
+      "id": "CLD-27", "category": "cloud",
+      "q": "จะออกแบบ VPC / เครือข่ายบนคลาวด์ให้ปลอดภัยอย่างไร",
+      "points": [
+        "แบ่ง subnet: public (LB, NAT gateway, bastion) และ private (app, DB ไม่มี public IP)",
+        "Security group / NACL อนุญาตเฉพาะพอร์ตที่จำเป็น (least privilege), DB เปิดรับเฉพาะจาก app tier",
+        "ออกเน็ตของ private ผ่าน NAT gateway; เข้าถึงเครื่องภายในผ่าน bastion/SSM",
+        "กระจายหลาย AZ, เข้ารหัส in-transit/at-rest, VPC flow logs + monitoring"
+      ]
+    },
+    {
+      "id": "CLD-28", "category": "cloud",
+      "q": "จะออกแบบระบบ Disaster Recovery (DR) บนคลาวด์อย่างไร มีกลยุทธ์ระดับใดบ้าง",
+      "points": [
+        "กำหนด RTO/RPO ก่อน แล้วเลือกกลยุทธ์ตามงบ/ความสำคัญ",
+        "ระดับ (ถูก→แพง, ช้า→เร็ว): Backup & Restore → Pilot Light → Warm Standby → Multi-site Active-Active",
+        "สำรองข้ามภูมิภาค (backup/replication), automation สำหรับ failover + IaC สร้างใหม่เร็ว",
+        "ทดสอบ DR สม่ำเสมอ (ไม่ใช่แค่มีแผน), ตรวจว่ากู้คืนได้จริงภายใน RTO"
+      ]
+    },
+    {
+      "id": "CLD-29", "category": "cloud",
+      "q": "จะออกแบบระบบประมวลผลข้อมูล (data pipeline / analytics) บนคลาวด์อย่างไร",
+      "points": [
+        "Ingest: รับข้อมูลผ่าน stream (Kafka/Kinesis/Pub-Sub) หรือ batch",
+        "Store: data lake (object storage) เก็บข้อมูลดิบ, data warehouse (BigQuery/Redshift) สำหรับ query",
+        "Process: batch (ETL/Spark) หรือ stream processing; แยก compute/storage เพื่อสเกลอิสระ",
+        "Serve: BI/dashboard; เพิ่ม data governance, schema, และ cost control (partition/tier)"
+      ]
+    },
+    {
+      "id": "CLD-30", "category": "cloud",
+      "q": "จะออกแบบระบบแบบ microservices ให้สื่อสารกันได้อย่างเสถียรและดูแลง่ายอย่างไร",
+      "points": [
+        "API Gateway เป็นทางเข้า, service discovery ให้บริการหากันได้, สื่อสารผ่าน REST/gRPC หรือ async (queue/event)",
+        "Resilience: timeout, retry, circuit breaker กันลูกโซ่ล่ม; แยก database ต่อ service (decentralized data)",
+        "Observability: centralized logging + metrics + distributed tracing (หา bottleneck ข้าม service)",
+        "Deploy อิสระด้วย container/K8s + CI/CD, จัดการ consistency ด้วย saga/eventual consistency"
+      ]
     }
   ]
 }
