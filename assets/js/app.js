@@ -102,25 +102,24 @@ function shuffled(arr) {
 function startSession() {
   const pool = poolQuestions();
   if (!pool.length) return;
-  session = { queue: cfg.shuffle ? shuffled(pool) : pool.slice(), pos: 0, seen: 0, revealed: 0 };
+  session = { queue: cfg.shuffle ? shuffled(pool) : pool.slice(), pos: 0, viewed: 0, revealed: 0 };
   show('practice');
   loadQuestion();
 }
 function loadQuestion() {
-  if (session.pos >= session.queue.length) {      // exhausted → reshuffle for another lap
-    session.queue = cfg.shuffle ? shuffled(poolQuestions()) : poolQuestions().slice();
-    session.pos = 0;
-  }
+  const total = session.queue.length;
+  if (session.pos >= total) { endSession(); return; }   // finished the round → summary
   const q = session.queue[session.pos];
-  session.seen++;
+  session.viewed = session.pos + 1;
   const cat = DATA.categories.find(c => c.id === q.category);
   $('#qCat').textContent = `${cat.emoji} ${cat.short}`;
   $('#qCat').className = `cat-pill cat-${q.category}`;
-  $('#qCount').textContent = `ข้อที่ ${session.seen}`;
+  $('#qCount').textContent = `ข้อที่ ${session.pos + 1} / ${total}`;
   $('#qText').textContent = q.q;
   $('#answerList').innerHTML = (q.points || []).map(p => `<li>${esc(p)}</li>`).join('');
   $('#answerCard').hidden = true;
   $('#btnReveal').textContent = '👁 ดูแนวคำตอบ';
+  $('#btnNext').textContent = (session.pos + 1 >= total) ? 'ดูสรุป →' : 'ข้อถัดไป →';
   startTimer();
 }
 function nextQuestion() {
@@ -183,7 +182,7 @@ function bindPractice() {
   $('#btnNext').addEventListener('click', nextQuestion);
   $('#btnPause').addEventListener('click', togglePause);
   $('#btnEnd').addEventListener('click', endSession);
-  $('#btnAgain').addEventListener('click', () => { show('setup'); });
+  $('#btnAgain').addEventListener('click', startSession);   // new shuffled round, same topics
   $('#btnHome').addEventListener('click', goHome);
   document.addEventListener('keydown', e => {
     if ($('#practice').hidden) return;
@@ -195,8 +194,9 @@ function bindPractice() {
 }
 function endSession() {
   clearInterval(timer.id);
+  const done = session.viewed >= session.queue.length;
   $('#summaryLine').innerHTML =
-    `ฝึกไป <b>${session.seen}</b> คำถาม · เปิดดูแนวคำตอบ <b>${session.revealed}</b> ครั้ง<br>เยี่ยมมาก! ทบทวนข้อที่ยังไม่มั่นใจอีกรอบได้เลย`;
+    `${done ? 'ครบทุกข้อในรอบนี้แล้ว 🎉<br>' : ''}ฝึกไป <b>${session.viewed}</b> จาก <b>${session.queue.length}</b> คำถาม · เปิดดูแนวคำตอบ <b>${session.revealed}</b> ครั้ง<br>ทบทวนข้อที่ยังไม่มั่นใจอีกรอบได้เลย`;
   show('summary');
 }
 
