@@ -1,0 +1,566 @@
+{
+  "meta": {
+    "name": "NaCl Lab — Interview Prep",
+    "description": "ฝึกตอบคำถามสัมภาษณ์ Lab NaCl: Network / Cloud / Basic Shell พร้อมจับเวลาและแนวคำตอบ"
+  },
+  "categories": [
+    { "id": "network", "name": "Network Fundamentals & Troubleshooting", "short": "Network", "emoji": "🌐" },
+    { "id": "cloud", "name": "Cloud Fundamentals & Architecture", "short": "Cloud", "emoji": "☁️" },
+    { "id": "shell", "name": "Basic Shell", "short": "Shell", "emoji": "⌨️" }
+  ],
+  "questions": [
+    {
+      "id": "NET-01", "category": "network",
+      "q": "อธิบาย OSI Model 7 ชั้น และหน้าที่ของแต่ละชั้นโดยสังเขป",
+      "points": [
+        "L7 Application (HTTP/DNS), L6 Presentation (เข้ารหัส/แปลงรูปแบบ TLS), L5 Session (จัดการเซสชัน)",
+        "L4 Transport (TCP/UDP, port, reliability), L3 Network (IP, routing), L2 Data Link (MAC, frame, switch), L1 Physical (บิต/สายสัญญาณ)",
+        "PDU: Data → Segment → Packet → Frame → Bit",
+        "ท่องจำ: All People Seem To Need Data Processing"
+      ]
+    },
+    {
+      "id": "NET-02", "category": "network",
+      "q": "TCP กับ UDP ต่างกันอย่างไร และแต่ละแบบเหมาะกับงานประเภทใด",
+      "points": [
+        "TCP: connection-oriented, มี handshake, รับประกันครบ+เรียงลำดับ, flow/congestion control → HTTP, SSH, FTP",
+        "UDP: connectionless, เร็ว, ไม่รับประกัน, overhead ต่ำ → DNS, VoIP, video streaming, เกม",
+        "เลือก TCP เมื่อความถูกต้องสำคัญ, UDP เมื่อความเร็ว/latency สำคัญกว่าความครบถ้วน"
+      ]
+    },
+    {
+      "id": "NET-03", "category": "network",
+      "q": "TCP 3-way handshake ทำงานอย่างไร และทำไมต้อง 3 ขั้น",
+      "points": [
+        "SYN (ไคลเอนต์ส่ง seq เริ่มต้น) → SYN-ACK (เซิร์ฟเวอร์ตอบ+ส่ง seq ตัวเอง) → ACK (ไคลเอนต์ยืนยัน)",
+        "ต้อง 3 ขั้นเพื่อ sync sequence number และยืนยันว่าทั้งสองฝั่งส่ง-รับได้จริง (สองทาง)",
+        "การปิดใช้ 4-way (FIN/ACK ทั้งสองฝั่ง)"
+      ]
+    },
+    {
+      "id": "NET-04", "category": "network",
+      "q": "เมื่อพิมพ์ google.com บนเบราว์เซอร์แล้วกด Enter เกิดอะไรขึ้นบ้างตั้งแต่ต้นจนได้หน้าเว็บ",
+      "points": [
+        "ตรวจ cache → DNS resolution (recursive/authoritative) แปลงชื่อเป็น IP",
+        "เปิด TCP connection (3-way handshake) ไปที่ IP:443",
+        "TLS handshake (แลกกุญแจ/ตรวจ certificate) → เข้ารหัส",
+        "ส่ง HTTP request → เซิร์ฟเวอร์ตอบ HTML → เบราว์เซอร์ render (โหลด CSS/JS/รูปเพิ่ม)",
+        "เกี่ยวข้องหลายชั้น: DNS(L7), TCP(L4), IP/routing(L3), ARP/MAC(L2)"
+      ]
+    },
+    {
+      "id": "NET-05", "category": "network",
+      "q": "อธิบายวิธีหา Network Address, Broadcast และจำนวน host จาก IP เช่น 192.168.10.130/26",
+      "points": [
+        "host bits = 32−26 = 6 → usable = 2^6−2 = 62 host",
+        "block size = 256−192 = 64 → 130 ตกในบล็อก 128–191",
+        "Network = 192.168.10.128, Broadcast = 192.168.10.191, host = .129–.190",
+        "ระวัง prefix /17–/23 ต้องคิดที่ octet ที่ 3 ไม่ใช่ octet สุดท้าย"
+      ]
+    },
+    {
+      "id": "NET-06", "category": "network",
+      "q": "Public IP กับ Private IP ต่างกันอย่างไร และ NAT ทำหน้าที่อะไร",
+      "points": [
+        "Private (RFC1918): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 — ใช้ภายใน route ออกเน็ตตรงไม่ได้",
+        "Public: ใช้ได้บนอินเทอร์เน็ต ไม่ซ้ำทั่วโลก",
+        "NAT แปลง private↔public เพื่อให้หลายเครื่องออกเน็ตผ่าน public IP เดียว (PAT แยกด้วย port) — แก้ปัญหา IPv4 หมด"
+      ]
+    },
+    {
+      "id": "NET-07", "category": "network",
+      "q": "DNS ทำงานอย่างไร และมี record type อะไรบ้างที่ควรรู้",
+      "points": [
+        "ไคลเอนต์ถาม resolver → root → TLD (.com) → authoritative server → ได้ IP (caching ตาม TTL)",
+        "A (→IPv4), AAAA (→IPv6), CNAME (alias), MX (mail), NS, PTR (reverse), TXT, SOA",
+        "ใช้ UDP/53 เป็นหลัก (query สั้น), TCP/53 สำหรับ zone transfer"
+      ]
+    },
+    {
+      "id": "NET-08", "category": "network",
+      "q": "DHCP ทำงานอย่างไร (ขั้นตอน DORA)",
+      "points": [
+        "Discover (ไคลเอนต์ broadcast หา DHCP) → Offer (เซิร์ฟเวอร์เสนอ IP)",
+        "Request (ไคลเอนต์ขอ IP นั้น) → Acknowledge (เซิร์ฟเวอร์ยืนยัน + lease)",
+        "แจก IP, subnet mask, default gateway, DNS ให้อัตโนมัติ"
+      ]
+    },
+    {
+      "id": "NET-09", "category": "network",
+      "q": "ARP คืออะไร ใช้ทำอะไร",
+      "points": [
+        "Address Resolution Protocol — หา MAC address จาก IP ภายใน LAN เดียวกัน",
+        "เมื่อจะส่งเฟรมใน L2 ต้องรู้ MAC ปลายทาง → broadcast 'ใครมี IP นี้' → เจ้าของตอบ MAC",
+        "มี ARP cache/table เก็บผลไว้ชั่วคราว"
+      ]
+    },
+    {
+      "id": "NET-10", "category": "network",
+      "q": "ping กับ traceroute ทำงานอย่างไร ต่างกันอย่างไร",
+      "points": [
+        "ping: ส่ง ICMP Echo Request → รอ Echo Reply วัด RTT และการเข้าถึง",
+        "traceroute: ส่งแพ็กเก็ตโดยเพิ่ม TTL ทีละ 1; แต่ละ router ที่ TTL=0 ตอบ 'Time Exceeded' → เห็นเส้นทางทีละ hop",
+        "ทั้งคู่พึ่ง ICMP; ใช้วินิจฉัยว่าปัญหาอยู่ช่วง hop ไหน"
+      ]
+    },
+    {
+      "id": "NET-11", "category": "network",
+      "q": "Default Gateway คืออะไร และสำคัญอย่างไร",
+      "points": [
+        "อุปกรณ์ (มัก = router) ที่แพ็กเก็ตส่งไปเมื่อปลายทางอยู่นอก subnet ตัวเอง",
+        "ถ้าไม่ตั้ง/ตั้งผิด → สื่อสารในวงเดียวกันได้แต่ออกเน็ต/ข้ามวงไม่ได้",
+        "route เริ่มต้นคือ 0.0.0.0/0"
+      ]
+    },
+    {
+      "id": "NET-12", "category": "network",
+      "q": "VLAN คืออะไร และ trunk port ต่างจาก access port อย่างไร",
+      "points": [
+        "VLAN แบ่ง broadcast domain เชิงตรรกะบนสวิตช์ (แยกกลุ่มโดยไม่ต้องเดินสายใหม่)",
+        "Access port อยู่ VLAN เดียว (ต่ออุปกรณ์ปลายทาง); Trunk port ส่งหลาย VLAN ข้ามสวิตช์ด้วยแท็ก 802.1Q",
+        "การสื่อสารข้าม VLAN ต้องผ่านอุปกรณ์ Layer 3 (router-on-a-stick / SVI)"
+      ]
+    },
+    {
+      "id": "NET-13", "category": "network",
+      "q": "Hub, Switch, Router ต่างกันอย่างไร (ทำงานที่ชั้นไหน)",
+      "points": [
+        "Hub (L1): ทวนสัญญาณ broadcast ทุกพอร์ต, 1 collision domain",
+        "Switch (L2): ส่งต่อเฟรมตาม MAC, แยก collision domain",
+        "Router (L3): ส่งต่อแพ็กเก็ตข้ามเครือข่ายตาม IP, แยก broadcast domain"
+      ]
+    },
+    {
+      "id": "NET-14", "category": "network",
+      "q": "Static routing กับ Dynamic routing ต่างกันอย่างไร และ router เลือกเส้นทางอย่างไรเมื่อมีหลายทาง",
+      "points": [
+        "Static: ตั้งมือ, ควบคุมได้, ไม่ปรับตัวเอง; Dynamic (RIP/OSPF/BGP): เรียนรู้เอง, ปรับเมื่อ topology เปลี่ยน",
+        "ลำดับเลือก: ① Longest Prefix Match → ② Administrative Distance ต่ำสุด → ③ metric ต่ำสุด",
+        "AD: Connected 0 < Static 1 < eBGP 20 < OSPF 110 < RIP 120 (ยิ่งน้อยยิ่งเชื่อ)"
+      ]
+    },
+    {
+      "id": "NET-15", "category": "network",
+      "q": "ผู้ใช้แจ้งว่า 'เข้าอินเทอร์เน็ตไม่ได้' คุณจะไล่หาสาเหตุอย่างไร (troubleshooting)",
+      "points": [
+        "ไล่เป็นชั้น (bottom-up หรือ top-down): สาย/ไฟ NIC (L1) → มี IP ไหม/ถูก subnet ไหม (ipconfig/ip a)",
+        "ping default gateway (ในวง) → ping 8.8.8.8 (ออกเน็ตได้ไหม, L3) → ping google.com (DNS ทำงานไหม, L7)",
+        "ถ้า ping IP ได้แต่ชื่อไม่ได้ = ปัญหา DNS; ถ้า gateway ไม่ได้ = ปัญหา LAN/สาย",
+        "ใช้ traceroute หา hop ที่ขาด, ตรวจ firewall/proxy"
+      ]
+    },
+    {
+      "id": "NET-16", "category": "network",
+      "q": "ping IP ปลายทางได้ แต่เปิดเว็บด้วยชื่อโดเมนไม่ได้ ปัญหาน่าจะอยู่ที่ไหน",
+      "points": [
+        "เป็นปัญหา DNS resolution (L3 เชื่อมต่อได้ แต่แปลงชื่อ→IP ไม่ได้)",
+        "ตรวจ DNS server (nslookup/dig), ลองเปลี่ยนเป็น 8.8.8.8, ตรวจไฟล์ /etc/resolv.conf หรือ hosts",
+        "อาจเป็น DNS server ล่ม, ตั้งค่าผิด, หรือ record ยังไม่ propagate"
+      ]
+    },
+    {
+      "id": "NET-17", "category": "network",
+      "q": "Bandwidth, Throughput และ Latency ต่างกันอย่างไร",
+      "points": [
+        "Bandwidth = ความจุสูงสุดตามทฤษฎี (bps); Throughput = อัตราจริงที่ได้ (มัก < bandwidth)",
+        "Latency = ความหน่วง/เวลาเดินทาง (ms); Jitter = ความแปรปรวนของ latency",
+        "เวลาส่งไฟล์ = ขนาด(bit)/bandwidth; เช่น 100 MB ผ่าน 50 Mbps = 100×8/50 = 16 วินาที (1 Byte=8 bit)"
+      ]
+    },
+    {
+      "id": "NET-18", "category": "network",
+      "q": "พอร์ตมาตรฐานที่ควรจำมีอะไรบ้าง",
+      "points": [
+        "20/21 FTP, 22 SSH, 23 Telnet, 25 SMTP, 53 DNS, 67/68 DHCP",
+        "80 HTTP, 443 HTTPS, 110 POP3, 143 IMAP, 161 SNMP, 389 LDAP",
+        "3306 MySQL, 5432 PostgreSQL, 3389 RDP, 6379 Redis"
+      ]
+    },
+    {
+      "id": "NET-19", "category": "network",
+      "q": "HTTP กับ HTTPS ต่างกันอย่างไร และ HTTP status code แบ่งเป็นกลุ่มอะไรบ้าง",
+      "points": [
+        "HTTPS = HTTP over TLS → เข้ารหัส, ยืนยันตัวตนเซิร์ฟเวอร์ (certificate), รักษา integrity",
+        "2xx สำเร็จ (200 OK), 3xx redirect (301/304), 4xx client error (400/401/403/404), 5xx server error (500/502/503)",
+        "จำแยก 401 (ยังไม่ยืนยันตัวตน) vs 403 (ยืนยันแล้วแต่ไม่มีสิทธิ)"
+      ]
+    },
+    {
+      "id": "NET-20", "category": "network",
+      "q": "Firewall แบบ stateful ต่างจาก stateless อย่างไร และ Load Balancer L4 ต่างจาก L7 อย่างไร",
+      "points": [
+        "Stateful จำสถานะ connection (อนุญาต reply ที่คู่กับ session ที่เริ่มไว้); stateless ดูทีละแพ็กเก็ตตามกฎ",
+        "L4 LB กระจายตาม IP/port (เร็ว, ไม่ดู content); L7 LB กระจายตาม HTTP path/host/cookie (ยืดหยุ่นกว่า)",
+        "อัลกอริทึม LB: round robin, least connections, IP hash"
+      ]
+    },
+
+    {
+      "id": "CLD-01", "category": "cloud",
+      "q": "IaaS, PaaS, SaaS ต่างกันอย่างไร ยกตัวอย่างแต่ละแบบ",
+      "points": [
+        "IaaS: เช่าโครงสร้างพื้นฐาน (VM/เครือข่าย/สตอเรจ) ลูกค้าดูแล OS ขึ้นไป — EC2, Compute Engine",
+        "PaaS: ผู้ให้บริการดูแลถึง runtime/OS ลูกค้าดูแลแค่โค้ด — App Engine, Heroku",
+        "SaaS: ใช้ซอฟต์แวร์สำเร็จผ่านเว็บ — Gmail, Office 365",
+        "ยิ่งขึ้นระดับ ลูกค้ายิ่งดูแลน้อยลง (control ↓, convenience ↑)"
+      ]
+    },
+    {
+      "id": "CLD-02", "category": "cloud",
+      "q": "Horizontal scaling กับ Vertical scaling ต่างกันอย่างไร แบบไหนดีกว่า",
+      "points": [
+        "Vertical (scale up): เพิ่มสเปกเครื่องเดิม (CPU/RAM) — ง่ายแต่มีเพดานและ downtime, single point of failure",
+        "Horizontal (scale out): เพิ่มจำนวนเครื่อง — สเกลได้ไม่จำกัด, ทนทานกว่า, แต่แอปต้อง stateless และมี LB",
+        "คลาวด์นิยม horizontal เพราะยืดหยุ่นและ HA ดีกว่า"
+      ]
+    },
+    {
+      "id": "CLD-03", "category": "cloud",
+      "q": "จะออกแบบระบบให้ High Availability (HA) ได้อย่างไร",
+      "points": [
+        "กระจายหลาย Availability Zone / region, ไม่มี single point of failure",
+        "Redundancy + Load Balancer + health check (ตัดเครื่องที่ล่มออก) + auto-scaling",
+        "ฐานข้อมูลทำ replication/failover, ใช้ stateless app + shared state (cache/DB)",
+        "Availability = MTBF/(MTBF+MTTR)"
+      ]
+    },
+    {
+      "id": "CLD-04", "category": "cloud",
+      "q": "Load Balancer ทำหน้าที่อะไร และมีอัลกอริทึมกระจายโหลดแบบใดบ้าง",
+      "points": [
+        "กระจายทราฟฟิกไปหลายเซิร์ฟเวอร์ → เพิ่ม throughput, HA, ไม่ให้เครื่องใดโหลดเกิน",
+        "Round Robin, Weighted RR, Least Connections, IP Hash, Least Response Time",
+        "มี health check ตัดโหนดที่ไม่ตอบ; L4 (transport) vs L7 (application)"
+      ]
+    },
+    {
+      "id": "CLD-05", "category": "cloud",
+      "q": "Auto-scaling ทำงานอย่างไร",
+      "points": [
+        "ตั้ง metric (CPU/req per sec/queue length) + threshold → เพิ่ม/ลดจำนวนอินสแตนซ์อัตโนมัติ",
+        "Scale-out เมื่อโหลดสูง, scale-in เมื่อโหลดต่ำ (ประหยัดค่าใช้จ่าย)",
+        "คู่กับ Load Balancer และ health check; ต้องออกแบบแอปให้ stateless"
+      ]
+    },
+    {
+      "id": "CLD-06", "category": "cloud",
+      "q": "CAP Theorem คืออะไร",
+      "points": [
+        "ระบบกระจายเลือกได้เต็มที่พร้อมกันแค่ 2 จาก 3: Consistency, Availability, Partition tolerance",
+        "เมื่อเกิด network Partition (P) ต้องเลือกระหว่าง C (ข้อมูลตรงกันเสมอ) หรือ A (ตอบได้เสมอ)",
+        "ตัวอย่าง: CP (เน้นความถูกต้อง เช่น ธนาคาร) vs AP (เน้นพร้อมใช้งาน เช่น social feed)"
+      ]
+    },
+    {
+      "id": "CLD-07", "category": "cloud",
+      "q": "Stateless กับ Stateful ต่างกันอย่างไร ทำไม stateless ถึงสเกลง่ายกว่า",
+      "points": [
+        "Stateless: แต่ละ request เป็นอิสระ ไม่เก็บสถานะไว้ที่เซิร์ฟเวอร์ → เครื่องไหนก็ตอบได้",
+        "Stateful: ผูก session กับเครื่องใดเครื่องหนึ่ง → สเกล/ย้ายยาก",
+        "Stateless สเกล horizontal ง่าย (เพิ่มเครื่องได้เลย); เก็บ state ไว้ที่ shared store (Redis/DB)"
+      ]
+    },
+    {
+      "id": "CLD-08", "category": "cloud",
+      "q": "Container กับ Virtual Machine ต่างกันอย่างไร",
+      "points": [
+        "VM: virtualize ฮาร์ดแวร์ มี guest OS เต็มต่อ VM → หนัก, บูตช้า, isolation สูง",
+        "Container: virtualize ระดับ OS แชร์ kernel โฮสต์ → เบา, บูตเร็ว (วินาที), พกพาได้",
+        "Container เหมาะกับ microservices/CI-CD; VM เหมาะเมื่อต้องการ OS ต่างชนิดหรือ isolation แข็ง"
+      ]
+    },
+    {
+      "id": "CLD-09", "category": "cloud",
+      "q": "องค์ประกอบหลักของ Kubernetes มีอะไรบ้าง (Pod, Deployment, Service)",
+      "points": [
+        "Pod: หน่วยเล็กสุด (1+ container ที่แชร์เครือข่าย/สตอเรจ)",
+        "Deployment: จัดการจำนวน replica + rolling update + self-healing",
+        "Service: จุดเข้าถึง Pod ที่คงที่ (ClusterIP/NodePort/LoadBalancer)",
+        "อื่น ๆ: Node, Namespace, ConfigMap/Secret, Ingress; control plane vs worker node"
+      ]
+    },
+    {
+      "id": "CLD-10", "category": "cloud",
+      "q": "CI/CD คืออะไร และมีประโยชน์อย่างไร",
+      "points": [
+        "CI (Continuous Integration): รวมโค้ด + build + test อัตโนมัติทุกครั้งที่ push",
+        "CD (Continuous Delivery/Deployment): ปล่อยขึ้น environment อัตโนมัติ",
+        "ลดข้อผิดพลาดจากการ deploy มือ, ส่งงานได้บ่อย+เร็ว, ตรวจเจอบั๊กเร็ว",
+        "เครื่องมือ: GitHub Actions, GitLab CI, Jenkins"
+      ]
+    },
+    {
+      "id": "CLD-11", "category": "cloud",
+      "q": "Infrastructure as Code (IaC) คืออะไร และ Terraform ต่างจากการตั้งค่าด้วยมืออย่างไร",
+      "points": [
+        "นิยาม infra ด้วยไฟล์โค้ด → ทำซ้ำได้, version control, review ได้, ลด config drift",
+        "Terraform: declarative (บอกผลลัพธ์ที่ต้องการ), multi-cloud, มี state file, plan ก่อน apply",
+        "ต่างจากคลิก GUI ทีละเครื่องที่ error-prone และทำซ้ำยาก"
+      ]
+    },
+    {
+      "id": "CLD-12", "category": "cloud",
+      "q": "SLA คืออะไร และ 99.9% availability คิดเป็น downtime เท่าไร",
+      "points": [
+        "SLA = สัญญาระดับบริการ (รับประกัน uptime, มีบทลงโทษถ้าไม่ถึง)",
+        "downtime = (1−A) × ช่วงเวลา; 99.9%/ปี ≈ 8.76 ชม., 99.99% ≈ 52 นาที, 99.999% ≈ 5 นาที",
+        "อนุกรม (พึ่งกัน) คูณ availability กัน; ขนาน (สำรอง) = 1−(1−A₁)(1−A₂)"
+      ]
+    },
+    {
+      "id": "CLD-13", "category": "cloud",
+      "q": "Caching ช่วยอะไร และมีกลยุทธ์/ปัญหาอะไรบ้าง",
+      "points": [
+        "ลด latency + ลดโหลด backend/DB โดยเก็บผลที่ใช้บ่อยไว้ใกล้ผู้ใช้",
+        "ระดับ: CDN (static ใกล้ผู้ใช้), in-memory (Redis/Memcached), DB query cache",
+        "ความท้าทาย: cache invalidation, TTL, stale data; รูปแบบ cache-aside / write-through"
+      ]
+    },
+    {
+      "id": "CLD-14", "category": "cloud",
+      "q": "SQL กับ NoSQL ต่างกันอย่างไร และ replication/sharding คืออะไร",
+      "points": [
+        "SQL: relational, schema ตายตัว, ACID, join — เหมาะกับ transaction",
+        "NoSQL: ยืดหยุ่น schema, scale-out ง่าย (document/key-value/column/graph) — เหมาะกับข้อมูลใหญ่/หลากรูป",
+        "Replication: ก็อปข้อมูลหลายเครื่อง (อ่านกระจาย/สำรอง); Sharding: แบ่งข้อมูลเป็นส่วนตามคีย์ (สเกลการเขียน)"
+      ]
+    },
+    {
+      "id": "CLD-15", "category": "cloud",
+      "q": "Microservices ต่างจาก Monolithic อย่างไร มีข้อดีข้อเสียอะไร",
+      "points": [
+        "Monolith: รวมทุกอย่างในแอปเดียว — เริ่มง่าย, deploy ทีเดียว, แต่สเกล/แก้เฉพาะส่วนยากเมื่อโต",
+        "Microservices: แยกบริการเล็ก ๆ deploy อิสระ, สเกลเฉพาะส่วนได้, ทีมแยกกันทำ",
+        "ข้อเสีย microservices: ซับซ้อนขึ้น (network, observability, data consistency, DevOps)"
+      ]
+    },
+    {
+      "id": "CLD-16", "category": "cloud",
+      "q": "ออกแบบสถาปัตยกรรมเว็บแอปที่รองรับผู้ใช้จำนวนมากอย่างไร",
+      "points": [
+        "DNS → CDN (static) → Load Balancer → app tier หลายอินสแตนซ์ (stateless) + auto-scaling",
+        "ชั้นข้อมูล: DB (primary + read replicas), cache (Redis) ลดโหลด DB",
+        "งานหนัก/ช้า → message queue ทำ async (worker); กระจายหลาย AZ เพื่อ HA",
+        "เพิ่ม monitoring/logging + backup/DR"
+      ]
+    },
+    {
+      "id": "CLD-17", "category": "cloud",
+      "q": "Disaster Recovery: RTO กับ RPO คืออะไร และมีกลยุทธ์สำรองข้อมูลแบบใด",
+      "points": [
+        "RTO (Recovery Time Objective): เวลาสูงสุดที่ยอมให้ระบบล่ม",
+        "RPO (Recovery Point Objective): ปริมาณข้อมูลย้อนหลังที่ยอมเสีย (เช่น backup ทุก 1 ชม. → RPO 1 ชม.)",
+        "กลยุทธ์: backup+restore, pilot light, warm standby, multi-site active-active (ยิ่งเร็วยิ่งแพง)"
+      ]
+    },
+    {
+      "id": "CLD-18", "category": "cloud",
+      "q": "Shared Responsibility Model ในคลาวด์คืออะไร",
+      "points": [
+        "ผู้ให้บริการดูแล 'security OF the cloud' (ฮาร์ดแวร์/hypervisor/เครือข่ายกายภาพ)",
+        "ลูกค้าดูแล 'security IN the cloud' (ข้อมูล, IAM, OS patch สำหรับ IaaS, การตั้งค่า)",
+        "ยิ่งเป็น PaaS/SaaS ผู้ให้บริการรับผิดชอบมากขึ้น; IaaS ลูกค้าต้องแพตช์ OS เอง"
+      ]
+    },
+    {
+      "id": "CLD-19", "category": "cloud",
+      "q": "Object storage, Block storage, File storage ต่างกันอย่างไร",
+      "points": [
+        "Object (S3): เก็บทั้งก้อน+metadata เข้าผ่าน HTTP — เหมาะกับไฟล์/สื่อ/backup, สเกลมหาศาล",
+        "Block (EBS): เข้าถึงเป็นบล็อกเหมือนดิสก์ — เหมาะกับ DB/OS ที่ต้อง random read/write",
+        "File (NFS/SMB): แชร์ไฟล์ระบบไดเรกทอรี — เหมาะกับแชร์ระหว่างหลายเครื่อง"
+      ]
+    },
+    {
+      "id": "CLD-20", "category": "cloud",
+      "q": "Message Queue มีไว้ทำไม ใช้ในสถานการณ์ใด",
+      "points": [
+        "ทำงานแบบ async + decouple ระหว่าง producer กับ consumer (ไม่ต้องรอกัน)",
+        "รองรับ traffic spike (buffer), retry เมื่อ fail, กระจายงานให้ worker หลายตัว",
+        "ตัวอย่าง: ส่งอีเมล, ประมวลผลรูป/วิดีโอ, order processing — SQS, RabbitMQ, Kafka"
+      ]
+    },
+
+    {
+      "id": "SH-01", "category": "shell",
+      "q": "chmod ทำงานอย่างไร chmod 755 หมายความว่าอย่างไร",
+      "points": [
+        "แต่ละหลัก = owner-group-others; r=4, w=2, x=1 (รวมกัน)",
+        "755 → 7=rwx (owner), 5=r-x (group), 5=r-x (others) = rwxr-xr-x",
+        "644 = rw-r--r-- ; 777 = ทุกคน rwx (เสี่ยง); 640 = rw-r-----",
+        "ใช้แบบสัญลักษณ์ได้: chmod u+x, chmod g-w, chmod +x script.sh"
+      ]
+    },
+    {
+      "id": "SH-02", "category": "shell",
+      "q": "chown กับ chgrp ใช้ทำอะไร ต่างกันอย่างไร",
+      "points": [
+        "chown <user> file → เปลี่ยนเจ้าของ; chown <user>:<group> file → เปลี่ยนทั้ง owner+group",
+        "chgrp <group> file → เปลี่ยนเฉพาะกลุ่ม",
+        "มัก sudo เพราะเปลี่ยน ownership ต้องสิทธิ์; ใช้ -R เพื่อทำทั้งไดเรกทอรี (recursive)"
+      ]
+    },
+    {
+      "id": "SH-03", "category": "shell",
+      "q": "คำสั่งพื้นฐานสำหรับดูและย้ายไปมาในระบบไฟล์มีอะไรบ้าง",
+      "points": [
+        "pwd (อยู่ที่ไหน), cd (เปลี่ยนโฟลเดอร์), ls -la (ดูไฟล์ทั้งหมดรวมซ่อน+รายละเอียด)",
+        "cd .. (ขึ้นหนึ่งชั้น), cd ~ (home), cd - (กลับที่เดิม)",
+        "path: / (root), ~ (home), . (ปัจจุบัน), .. (แม่)"
+      ]
+    },
+    {
+      "id": "SH-04", "category": "shell",
+      "q": "จะค้นหา 'ไฟล์' กับค้นหา 'ข้อความในไฟล์' ใช้คำสั่งอะไร ต่างกันอย่างไร",
+      "points": [
+        "find: ค้นหาไฟล์ตามชื่อ/คุณสมบัติ เช่น find . -name '*.log' -type f",
+        "grep: ค้นข้อความภายในไฟล์ เช่น grep -rn 'error' /var/log",
+        "grep options: -i (ไม่สนตัวพิมพ์), -r (recursive), -v (กลับเงื่อนไข), -n (เลขบรรทัด)"
+      ]
+    },
+    {
+      "id": "SH-05", "category": "shell",
+      "q": "Pipe (|) และ Redirection (>, >>, 2>) ทำงานอย่างไร",
+      "points": [
+        "| ส่ง stdout ของคำสั่งซ้ายเป็น stdin ของคำสั่งขวา เช่น cat log | grep err | wc -l",
+        "> เขียนทับไฟล์, >> ต่อท้ายไฟล์ (stdout)",
+        "2> เปลี่ยนทาง stderr, 2>&1 รวม stderr เข้ากับ stdout, /dev/null ทิ้ง output"
+      ]
+    },
+    {
+      "id": "SH-06", "category": "shell",
+      "q": "จัดการโปรเซสใน Linux อย่างไร (ดู/ฆ่าโปรเซส)",
+      "points": [
+        "ps aux / top / htop → ดูโปรเซสและการใช้ทรัพยากร",
+        "kill <pid> ส่ง SIGTERM (ปิดสุภาพ); kill -9 <pid> ส่ง SIGKILL (บังคับปิดทันที)",
+        "pgrep/pkill <name> ค้น/ฆ่าตามชื่อ; & รันเบื้องหลัง, jobs, fg, nohup"
+      ]
+    },
+    {
+      "id": "SH-07", "category": "shell",
+      "q": "ดูเนื้อหาไฟล์มีคำสั่งอะไรบ้าง ถ้าอยากดู log ที่อัปเดตแบบเรียลไทม์ใช้อะไร",
+      "points": [
+        "cat (ทั้งไฟล์), less (เลื่อนดูทีละหน้า), head -n (ต้นไฟล์), tail -n (ท้ายไฟล์)",
+        "tail -f file.log → ตามดู log ที่เขียนเข้ามาแบบเรียลไทม์",
+        "grep ร่วมด้วยเพื่อกรอง เช่น tail -f app.log | grep ERROR"
+      ]
+    },
+    {
+      "id": "SH-08", "category": "shell",
+      "q": "จะทำให้สคริปต์ .sh รันได้และรันอย่างไร",
+      "points": [
+        "ใส่ shebang บรรทัดแรก: #!/bin/bash",
+        "ให้สิทธิ์ execute: chmod +x script.sh",
+        "รัน: ./script.sh (หรือ bash script.sh โดยไม่ต้อง +x)"
+      ]
+    },
+    {
+      "id": "SH-09", "category": "shell",
+      "q": "Environment variable คืออะไร ตั้งค่าและเรียกดูอย่างไร $PATH คืออะไร",
+      "points": [
+        "ตัวแปรสภาพแวดล้อมที่ process อ่านได้ เช่น การตั้งค่า/ความลับ",
+        "ตั้ง: export NAME=value ; ดู: echo $NAME หรือ env / printenv",
+        "$PATH = รายการโฟลเดอร์ที่ shell ค้นหาคำสั่ง (คั่นด้วย :)"
+      ]
+    },
+    {
+      "id": "SH-10", "category": "shell",
+      "q": "ssh และ scp ใช้ทำอะไร ยกตัวอย่างการใช้งาน",
+      "points": [
+        "ssh user@host → เข้าเครื่องระยะไกลแบบเข้ารหัส (พอร์ต 22)",
+        "scp file user@host:/path → คัดลอกไฟล์ผ่าน SSH; scp -r สำหรับโฟลเดอร์",
+        "ใช้ SSH key (ssh-keygen, ~/.ssh/authorized_keys) แทนรหัสผ่านเพื่อความปลอดภัย"
+      ]
+    },
+    {
+      "id": "SH-11", "category": "shell",
+      "q": "Symbolic link (soft link) ต่างจาก hard link อย่างไร สร้างอย่างไร",
+      "points": [
+        "ln -s target linkname → soft link (ชี้ตาม path, ข้าม filesystem ได้, เสียถ้าลบต้นทาง)",
+        "ln target linkname → hard link (ชี้ inode เดียวกัน, ต้อง filesystem เดียว)",
+        "soft link เหมือน shortcut; ls -l แสดง link -> target"
+      ]
+    },
+    {
+      "id": "SH-12", "category": "shell",
+      "q": "ตรวจการใช้พื้นที่ดิสก์อย่างไร df กับ du ต่างกันอย่างไร",
+      "points": [
+        "df -h → พื้นที่ว่าง/ใช้ไปของแต่ละ filesystem (mount point) แบบอ่านง่าย",
+        "du -sh <dir> → ขนาดที่ไดเรกทอรี/ไฟล์นั้นใช้",
+        "df มองภาพรวมดิสก์, du เจาะดูว่าอะไรกินพื้นที่"
+      ]
+    },
+    {
+      "id": "SH-13", "category": "shell",
+      "q": "จะดูว่ามีพอร์ตไหน/บริการใดกำลัง listen อยู่ ใช้คำสั่งอะไร",
+      "points": [
+        "ss -tulnp (t=tcp, u=udp, l=listening, n=ตัวเลข, p=process) — คำสั่งสมัยใหม่",
+        "netstat -tulnp (รุ่นเก่า), lsof -i :80 (ดูว่าใครใช้พอร์ต 80)",
+        "ใช้ diagnose บริการที่ไม่ตอบ/พอร์ตชนกัน"
+      ]
+    },
+    {
+      "id": "SH-14", "category": "shell",
+      "q": "อยากนับจำนวนบรรทัดที่มีคำว่า ERROR ในไฟล์ log ทำอย่างไร",
+      "points": [
+        "grep -c 'ERROR' app.log → นับจำนวนบรรทัดที่ตรงโดยตรง",
+        "หรือ grep 'ERROR' app.log | wc -l",
+        "เพิ่ม -i ถ้าไม่สนตัวพิมพ์, -r ถ้าค้นทั้งโฟลเดอร์"
+      ]
+    },
+    {
+      "id": "SH-15", "category": "shell",
+      "q": "จะตั้งงานให้รันอัตโนมัติตามเวลา (scheduled) ใน Linux ทำอย่างไร",
+      "points": [
+        "cron: แก้ด้วย crontab -e; รูปแบบ 5 ช่อง: นาที ชม. วันที่ เดือน วันในสัปดาห์ + คำสั่ง",
+        "เช่น 0 2 * * * /path/backup.sh = รันทุกวันตี 2",
+        "systemd timer เป็นอีกทางเลือกที่ยืดหยุ่นกว่า"
+      ]
+    },
+    {
+      "id": "SH-16", "category": "shell",
+      "q": "บีบอัดและแตกไฟล์ด้วย tar/gzip ทำอย่างไร",
+      "points": [
+        "สร้าง: tar -czvf archive.tar.gz folder/ (c=create, z=gzip, v=verbose, f=file)",
+        "แตก: tar -xzvf archive.tar.gz (x=extract)",
+        "gzip file / gunzip file.gz สำหรับไฟล์เดี่ยว; zip/unzip เป็นอีกรูปแบบ"
+      ]
+    },
+    {
+      "id": "SH-17", "category": "shell",
+      "q": "sed กับ awk ใช้ทำอะไร ยกตัวอย่างสั้น ๆ",
+      "points": [
+        "sed = stream editor แก้ข้อความ เช่น sed 's/old/new/g' file (แทนที่ทุกตำแหน่ง)",
+        "awk = ประมวลผลข้อความเป็นคอลัมน์ เช่น awk '{print $1,$3}' (พิมพ์คอลัมน์ 1 และ 3)",
+        "awk -F',' กำหนดตัวคั่น; ใช้คู่ pipe บ่อยในการดึง/แปลงข้อมูล"
+      ]
+    },
+    {
+      "id": "SH-18", "category": "shell",
+      "q": "Wildcard / globbing ใน shell มีอะไรบ้าง",
+      "points": [
+        "* = ตรงกับอักขระใด ๆ กี่ตัวก็ได้ (เช่น *.txt), ? = ตรง 1 ตัว",
+        "[abc] = ตรงตัวใดตัวหนึ่งในวงเล็บ, [0-9] = ช่วง",
+        "เช่น rm *.log, ls file?.txt, cp img[1-3].png dest/"
+      ]
+    },
+    {
+      "id": "SH-19", "category": "shell",
+      "q": "sudo, su และ root ต่างกันอย่างไร",
+      "points": [
+        "root = ผู้ใช้สูงสุด (uid 0) ทำได้ทุกอย่าง",
+        "sudo <cmd> = รันคำสั่งเดียวด้วยสิทธิ์ root (ตามที่อนุญาตใน /etc/sudoers) — ปลอดภัย/ตรวจสอบได้",
+        "su = สลับเป็นผู้ใช้อื่น (su - = เป็น root เต็มตัว); นิยม sudo มากกว่า su ตามหลัก least privilege"
+      ]
+    },
+    {
+      "id": "SH-20", "category": "shell",
+      "q": "จะซ่อน output ที่ไม่ต้องการหรือแยกเก็บ error ทำอย่างไร (/dev/null, 2>&1)",
+      "points": [
+        "command > /dev/null → ทิ้ง stdout; 2> /dev/null → ทิ้ง error",
+        "command > out.log 2>&1 → เก็บทั้ง stdout+stderr ลงไฟล์เดียว",
+        "command 2>&1 | tee log → ดูบนจอพร้อมบันทึกไฟล์"
+      ]
+    }
+  ]
+}
