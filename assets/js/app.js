@@ -133,6 +133,9 @@ function loadQuestion() {
   $('#qCount').textContent = `ข้อที่ ${session.pos + 1} / ${total}`;
   $('#qText').textContent = q.q;
   $('#answerList').innerHTML = (q.points || []).map(p => `<li>${esc(p)}</li>`).join('');
+  const exEl = $('#answerExample');
+  if (q.example) { exEl.innerHTML = `<span class="ex-badge">💡 ตัวอย่าง</span>${esc(q.example)}`; exEl.hidden = false; }
+  else exEl.hidden = true;
   $('#answerCard').hidden = true;
   $('#btnReveal').textContent = '👁 ดูแนวคำตอบ';
   $('#btnNext').textContent = (session.pos + 1 >= total) ? 'ดูสรุป →' : 'ข้อถัดไป →';
