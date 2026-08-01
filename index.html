@@ -105,9 +105,20 @@
     </div>
 
     <div class="prac-controls">
+      <button class="ghost-btn" id="btnPrev" type="button">← ก่อนหน้า</button>
       <button class="secondary-btn" id="btnReveal" type="button">👁 ดูแนวคำตอบ</button>
       <button class="primary-btn" id="btnNext" type="button">ข้อถัดไป →</button>
     </div>
+
+    <div class="map-row">
+      <button class="ghost-btn sm" id="btnMap" type="button" aria-expanded="false">⊞ ผังข้อ</button>
+      <span class="map-legend">
+        <span class="lg lg-cur">ปัจจุบัน</span>
+        <span class="lg lg-seen">เคยดู</span>
+        <span class="lg lg-flag">🚩 ปักธง</span>
+      </span>
+    </div>
+    <div class="qmap" id="qmap" hidden aria-label="ผังข้อ"></div>
   </section>
 
   <!-- ══ SUMMARY ══ -->

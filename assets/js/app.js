@@ -117,7 +117,8 @@ function shuffled(arr) {
 function startSession() {
   const pool = poolQuestions();
   if (!pool.length) return;
-  session = { queue: cfg.shuffle ? shuffled(pool) : pool.slice(), pos: 0, viewed: 0, revealed: 0 };
+  session = { queue: cfg.shuffle ? shuffled(pool) : pool.slice(), pos: 0, viewed: 0, revealed: 0, visited: new Set() };
+  $('#qmap').hidden = true; $('#btnMap').setAttribute('aria-expanded', 'false');
   show('practice');
   loadQuestion();
 }
@@ -135,9 +136,40 @@ function loadQuestion() {
   $('#answerCard').hidden = true;
   $('#btnReveal').textContent = '👁 ดูแนวคำตอบ';
   $('#btnNext').textContent = (session.pos + 1 >= total) ? 'ดูสรุป →' : 'ข้อถัดไป →';
+  $('#btnPrev').disabled = (session.pos === 0);
   session.currentId = q.id;
+  session.visited.add(session.pos);
   updateFlagBtn();
+  if (!$('#qmap').hidden) renderMap();
   startTimer();
+}
+function prevQuestion() {
+  if (!session || session.pos <= 0) return;
+  session.pos--;
+  loadQuestion();
+}
+function jumpTo(i) {
+  if (!session || i < 0 || i >= session.queue.length) return;
+  session.pos = i;
+  loadQuestion();
+}
+
+/* ─── question map (ผังข้อ) ─── */
+function toggleMap() {
+  const m = $('#qmap');
+  m.hidden = !m.hidden;
+  $('#btnMap').setAttribute('aria-expanded', String(!m.hidden));
+  if (!m.hidden) { renderMap(); m.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+}
+function renderMap() {
+  if (!session) return;
+  $('#qmap').innerHTML = session.queue.map((q, i) => {
+    const cls = ['qmap-cell', `cat-${q.category}`];
+    if (i === session.pos) cls.push('is-current');
+    else if (session.visited.has(i)) cls.push('is-visited');
+    if (flags.has(q.id)) cls.push('is-flagged');
+    return `<button class="${cls.join(' ')}" data-i="${i}" type="button" title="${esc(q.q)}">${i + 1}</button>`;
+  }).join('');
 }
 
 /* ─── flags (bookmark for later review) ─── */
@@ -153,6 +185,7 @@ function toggleFlag() {
   if (flags.has(id)) flags.delete(id); else flags.add(id);
   saveFlags();
   updateFlagBtn();
+  if (!$('#qmap').hidden) renderMap();
 }
 function renderFlagBar() {
   const bar = $('#flagBar');
@@ -162,7 +195,8 @@ function renderFlagBar() {
 function startFlaggedSession() {
   const pool = DATA.questions.filter(q => flags.has(q.id));
   if (!pool.length) return;
-  session = { queue: shuffled(pool), pos: 0, viewed: 0, revealed: 0 };
+  session = { queue: shuffled(pool), pos: 0, viewed: 0, revealed: 0, visited: new Set() };
+  $('#qmap').hidden = true; $('#btnMap').setAttribute('aria-expanded', 'false');
   show('practice');
   loadQuestion();
 }
@@ -227,9 +261,15 @@ function togglePause() {
 function bindPractice() {
   $('#btnReveal').addEventListener('click', reveal);
   $('#btnNext').addEventListener('click', nextQuestion);
+  $('#btnPrev').addEventListener('click', prevQuestion);
   $('#btnPause').addEventListener('click', togglePause);
   $('#btnEnd').addEventListener('click', endSession);
   $('#btnFlag').addEventListener('click', toggleFlag);
+  $('#btnMap').addEventListener('click', toggleMap);
+  $('#qmap').addEventListener('click', e => {
+    const cell = e.target.closest('.qmap-cell');
+    if (cell) jumpTo(Number(cell.dataset.i));
+  });
   $('#btnAgain').addEventListener('click', startSession);   // new shuffled round, same topics
   $('#btnHome').addEventListener('click', goHome);
   document.addEventListener('keydown', e => {
@@ -237,6 +277,7 @@ function bindPractice() {
     if (e.target.tagName === 'INPUT') return;
     if (e.code === 'Space') { e.preventDefault(); reveal(); }
     else if (e.code === 'ArrowRight' || e.code === 'Enter') { e.preventDefault(); nextQuestion(); }
+    else if (e.code === 'ArrowLeft') { e.preventDefault(); prevQuestion(); }
     else if (e.key.toLowerCase() === 'p') { togglePause(); }
     else if (e.key.toLowerCase() === 'f') { toggleFlag(); }
   });
