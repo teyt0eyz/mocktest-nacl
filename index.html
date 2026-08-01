@@ -63,11 +63,19 @@
     </div>
 
     <div class="start-bar">
-      <div class="start-info" id="startInfo">พร้อมฝึก — <b>60</b> คำถาม</div>
+      <div class="start-info" id="startInfo">พร้อมฝึก — <b>120</b> คำถาม</div>
       <button class="primary-btn lg" id="btnStart" type="button">เริ่มฝึกสัมภาษณ์ →</button>
     </div>
 
-    <p class="tip-line">💡 เคล็ดลับสัมภาษณ์: พูดออกเสียงตอบให้ครบ แล้วค่อยกด "ดูแนวคำตอบ" เพื่อเทียบ · ปุ่มลัด: <kbd>Space</kbd> ดูคำตอบ · <kbd>→</kbd> ข้อถัดไป · <kbd>P</kbd> พัก</p>
+    <div class="flag-bar" id="flagBar" hidden>
+      <span class="flag-bar-label">🚩 ปักธงไว้ <b id="flagCount">0</b> ข้อ (ไว้ทบทวนทีหลัง)</span>
+      <div class="flag-bar-actions">
+        <button class="secondary-btn sm" id="btnReviewFlagged" type="button">ทบทวนเฉพาะที่ปักธง →</button>
+        <button class="ghost-btn sm" id="btnClearFlags" type="button">ล้างธงทั้งหมด</button>
+      </div>
+    </div>
+
+    <p class="tip-line">💡 เคล็ดลับสัมภาษณ์: พูดออกเสียงตอบให้ครบ แล้วค่อยกด "ดูแนวคำตอบ" เพื่อเทียบ · ปุ่มลัด: <kbd>Space</kbd> ดูคำตอบ · <kbd>→</kbd> ข้อถัดไป · <kbd>F</kbd> ปักธง · <kbd>P</kbd> พัก</p>
   </section>
 
   <!-- ══ PRACTICE ══ -->
@@ -76,6 +84,7 @@
       <span class="cat-pill" id="qCat">—</span>
       <span class="q-count" id="qCount">1 / 60</span>
       <div class="prac-top-right">
+        <button class="ghost-btn sm flag-btn" id="btnFlag" type="button">⚑ ปักธง</button>
         <button class="ghost-btn sm" id="btnPause" type="button">⏸ พัก</button>
         <button class="ghost-btn sm" id="btnEnd" type="button">จบเซสชัน</button>
       </div>

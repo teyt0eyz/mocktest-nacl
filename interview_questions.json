@@ -763,6 +763,374 @@
         "Observability: centralized logging + metrics + distributed tracing (หา bottleneck ข้าม service)",
         "Deploy อิสระด้วย container/K8s + CI/CD, จัดการ consistency ด้วย saga/eventual consistency"
       ]
+    },
+
+    {
+      "id": "NET-31", "category": "network",
+      "q": "IPv4 กับ IPv6 ต่างกันอย่างไร และทำไมต้องมี IPv6",
+      "points": [
+        "IPv4 = 32 บิต (~4.3 พันล้าน address ซึ่งหมดแล้ว); IPv6 = 128 บิต (แทบไม่มีวันหมด)",
+        "IPv6 เขียนเป็น hex 8 กลุ่ม ย่อ 0 ต่อเนื่องด้วย ::, ไม่มี broadcast (ใช้ multicast/anycast), มี auto-config (SLAAC)",
+        "IPv4 ต้องพึ่ง NAT เพราะ address ไม่พอ; IPv6 ให้ทุกอุปกรณ์มี global address ได้",
+        "ช่วงเปลี่ยนผ่านมัก dual-stack (รันทั้ง IPv4 และ IPv6 พร้อมกัน)"
+      ]
+    },
+    {
+      "id": "NET-32", "category": "network",
+      "q": "MAC address คืออะไร และสวิตช์เรียนรู้ว่าอุปกรณ์อยู่พอร์ตไหนได้อย่างไร",
+      "points": [
+        "MAC = ที่อยู่ฮาร์ดแวร์ 48 บิต ระดับ L2 (unique ต่อ NIC)",
+        "สวิตช์อ่าน source MAC ของเฟรมที่เข้ามา → จำว่า MAC นี้อยู่พอร์ตไหน (MAC address table)",
+        "ปลายทางที่ยังไม่รู้จัก (unknown unicast) → flood ออกทุกพอร์ต; รู้แล้ว → ส่งเฉพาะพอร์ตนั้น",
+        "broadcast (FF:FF:FF:FF:FF:FF) ส่งทุกพอร์ตในวง/VLAN เดียวกัน"
+      ]
+    },
+    {
+      "id": "NET-33", "category": "network",
+      "q": "เครื่องต้นทางรู้ได้อย่างไรว่าปลายทางอยู่ในวงเดียวกัน หรือต้องส่งผ่าน gateway",
+      "points": [
+        "นำ IP ปลายทาง AND กับ subnet mask แล้วเทียบกับ network ของตัวเอง",
+        "ถ้าอยู่ subnet เดียวกัน → ส่งตรง (ARP หา MAC ของปลายทาง)",
+        "ถ้าต่าง subnet → ส่งไปที่ default gateway (ARP หา MAC ของ gateway) แล้ว router ส่งต่อ"
+      ]
+    },
+    {
+      "id": "NET-34", "category": "network",
+      "q": "TCP ทำ flow control กับ congestion control ต่างกันอย่างไร",
+      "points": [
+        "Flow control: กันไม่ให้ 'ผู้รับ' ล้น ด้วย receive window (ผู้รับแจ้งว่ารับได้อีกเท่าไร)",
+        "Congestion control: กันไม่ให้ 'เครือข่าย' แออัด ด้วย congestion window",
+        "กลไก congestion: slow start (เพิ่มเร็วตอนแรก) + AIMD (เพิ่มทีละน้อย, ลดครึ่งเมื่อเจอ loss)",
+        "เป้าหมายต่างกัน: flow มองผู้รับ, congestion มองสภาพเครือข่าย"
+      ]
+    },
+    {
+      "id": "NET-35", "category": "network",
+      "q": "MTU, MSS และ fragmentation คืออะไร ทำให้เกิดปัญหาอะไรได้",
+      "points": [
+        "MTU = ขนาดเฟรมใหญ่สุดที่ส่งได้ (Ethernet ปกติ 1500 ไบต์)",
+        "แพ็กเก็ตใหญ่กว่า MTU ต้อง fragment (แตกชิ้น) → เสีย performance; DF bit สั่งห้ามแตก",
+        "MSS = ขนาด payload สูงสุดของ TCP (= MTU − IP/TCP header)",
+        "MTU mismatch/PMTUD ล้มเหลว → การเชื่อมต่อค้าง/ช้าโดยไม่ error ชัด"
+      ]
+    },
+    {
+      "id": "NET-36", "category": "network",
+      "q": "Proxy กับ Reverse Proxy ต่างกันอย่างไร",
+      "points": [
+        "Forward proxy: อยู่ฝั่ง client ออกไปหาเซิร์ฟเวอร์แทน — ซ่อน/กรอง/แคชให้ผู้ใช้",
+        "Reverse proxy: อยู่หน้าเซิร์ฟเวอร์ รับ request จากภายนอกแทน backend — ทำ Load Balancing, SSL termination, caching, ซ่อน backend (เช่น Nginx)",
+        "ต่างกันที่ 'อยู่ฝั่งไหน' และ 'ปกป้อง/ซ่อนใคร'"
+      ]
+    },
+    {
+      "id": "NET-37", "category": "network",
+      "q": "Collision domain กับ Broadcast domain ต่างกันอย่างไร อุปกรณ์ใดแบ่งอะไร",
+      "points": [
+        "Collision domain: ขอบเขตที่เฟรมชนกันได้ — Hub = 1 อันใหญ่, Switch แยกทุกพอร์ต (แต่ละพอร์ต = 1)",
+        "Broadcast domain: ขอบเขตที่ broadcast ไปถึง — Hub/Switch = 1 อัน, Router หรือ VLAN แยกออก",
+        "ยิ่งแบ่งย่อย ยิ่งลดการชน/ลดทราฟฟิกที่ไม่จำเป็น"
+      ]
+    },
+    {
+      "id": "NET-38", "category": "network",
+      "q": "เครื่องมือที่ใช้ diagnose ปัญหาเครือข่ายมีอะไรบ้าง ใช้ตัวไหนตอนไหน",
+      "points": [
+        "ping (ถึงไหม/RTT), traceroute/mtr (เส้นทาง+hop ที่ขาด)",
+        "nslookup/dig (ปัญหา DNS), ss/netstat (พอร์ต/connection), ip a/ifconfig (ดูค่า config)",
+        "tcpdump/Wireshark (จับแพ็กเก็ตดูรายละเอียดระดับลึก)",
+        "monitoring/SNMP สำหรับเฝ้าดูต่อเนื่อง"
+      ]
+    },
+    {
+      "id": "NET-39", "category": "network",
+      "q": "QoS (Quality of Service) คืออะไร ทำไมต้องมี",
+      "points": [
+        "จัดลำดับความสำคัญและจัดสรร bandwidth ให้ traffic สำคัญ (VoIP/video real-time) มาก่อน",
+        "กลไก: classification/marking (DSCP), queuing, policing/shaping",
+        "จำเป็นเมื่อ bandwidth จำกัดและมี traffic หลายชนิด → ลด jitter/latency ให้เสียง/วิดีโอไม่กระตุก"
+      ]
+    },
+    {
+      "id": "NET-40", "category": "network",
+      "q": "VPN คืออะไร Site-to-Site ต่างจาก Remote Access อย่างไร",
+      "points": [
+        "VPN = อุโมงค์เข้ารหัสผ่านเครือข่ายสาธารณะ ทำให้เหมือนอยู่วงเดียวกันอย่างปลอดภัย",
+        "Site-to-Site: เชื่อมสองเครือข่ายเข้าด้วยกัน (สาขา ↔ HQ) อัตโนมัติ มัก IPsec ที่ gateway",
+        "Remote Access: ผู้ใช้รายคนเชื่อมเข้าองค์กรจากที่ไหนก็ได้ (SSL VPN / IPsec client)"
+      ]
+    },
+
+    {
+      "id": "CLD-31", "category": "cloud",
+      "q": "Serverless (FaaS) คืออะไร เหมาะกับงานแบบใด และมีข้อจำกัดอะไร",
+      "points": [
+        "รันโค้ดเป็นฟังก์ชันตาม event โดยไม่ต้องจัดการเซิร์ฟเวอร์ จ่ายตามการเรียกจริง (scale-to-zero)",
+        "เหมาะ: งานเป็นครั้งคราว/event-driven, API เบา, glue code, ประมวลผลไฟล์อัปโหลด",
+        "ข้อจำกัด: cold start (หน่วงครั้งแรก), เวลารันจำกัด (timeout), stateless, เสี่ยง vendor lock-in"
+      ]
+    },
+    {
+      "id": "CLD-32", "category": "cloud",
+      "q": "IAM บนคลาวด์คืออะไร และมีแนวปฏิบัติด้านความปลอดภัยอย่างไร",
+      "points": [
+        "จัดการตัวตน+สิทธิ: users, groups, roles, policies",
+        "หลัก least privilege (ให้สิทธิ์เท่าที่จำเป็น), ใช้ role แทนการฝัง access key ในโค้ด",
+        "เปิด MFA, หมุน credential เป็นระยะ, แยกสิทธิ์ตามหน้าที่, ตรวจสอบผ่าน audit log"
+      ]
+    },
+    {
+      "id": "CLD-33", "category": "cloud",
+      "q": "Rolling, Blue-Green และ Canary deployment ต่างกันอย่างไร",
+      "points": [
+        "Rolling: อัปเดตทีละส่วน (ประหยัดทรัพยากร แต่ช่วงหนึ่งจะมีสองเวอร์ชันปนกัน)",
+        "Blue-Green: รันสองสภาพแวดล้อม สลับทราฟฟิกทันที rollback เร็ว (ใช้ทรัพยากรเพิ่มเป็นเท่าตัว)",
+        "Canary: ปล่อยให้ผู้ใช้ส่วนน้อยก่อน เฝ้าดู metric แล้วค่อยขยาย (ความเสี่ยงต่ำสุด)"
+      ]
+    },
+    {
+      "id": "CLD-34", "category": "cloud",
+      "q": "Observability คืออะไร ประกอบด้วยอะไรบ้าง",
+      "points": [
+        "ความสามารถเข้าใจสถานะระบบจากภายนอก ผ่าน 3 เสา: Metrics (ตัวเลข), Logs (เหตุการณ์), Traces (ตามคำขอข้าม service)",
+        "Golden signals (SRE): Latency, Traffic, Errors, Saturation",
+        "ตั้ง dashboard + alerting → รู้ปัญหาก่อนผู้ใช้ และ debug ได้เร็ว"
+      ]
+    },
+    {
+      "id": "CLD-35", "category": "cloud",
+      "q": "Elasticity กับ Scalability ต่างกันอย่างไร",
+      "points": [
+        "Scalability = ความสามารถรองรับโหลดที่โตขึ้น (เพิ่มทรัพยากรได้เมื่อจำเป็น)",
+        "Elasticity = ปรับทรัพยากรขึ้น-ลงอัตโนมัติตามโหลดจริงแบบเรียลไทม์ แล้วลดลงเมื่อโหลดต่ำ",
+        "Elastic เน้นตอบสนองทันที+ประหยัด; scalable เน้นเพดานที่รองรับได้"
+      ]
+    },
+    {
+      "id": "CLD-36", "category": "cloud",
+      "q": "ใช้ Managed service (เช่น RDS) กับรันเอง (self-managed บน VM) ต่างกันอย่างไร เลือกอย่างไร",
+      "points": [
+        "Managed: ผู้ให้บริการดูแล patch/backup/HA/scaling ให้ → เร็ว ลดภาระ แต่ยืดหยุ่นน้อยและอาจแพงกว่า",
+        "Self-managed: คุมได้เต็มที่ ปรับแต่งลึก แต่ต้องดูแลเอง (patch, backup, monitoring, สเกล)",
+        "เลือกตาม trade-off: ทีมเล็ก/อยากเร็ว → managed; ต้องปรับแต่งพิเศษ/คุมต้นทุน → self-managed"
+      ]
+    },
+    {
+      "id": "CLD-37", "category": "cloud",
+      "q": "Strong consistency กับ Eventual consistency ต่างกันอย่างไร ใช้ตอนไหน",
+      "points": [
+        "Strong: อ่านได้ค่าล่าสุดเสมอทันที (เช่น ยอดเงินธนาคาร) — latency สูงกว่า, สเกลยากกว่า",
+        "Eventual: ข้อมูลจะตรงกันในที่สุด (เช่น จำนวนไลก์/feed) — พร้อมใช้งาน+สเกลดีกว่า",
+        "เชื่อมโยง CAP theorem: เลือกตามความต้องการของแอป (ความถูกต้อง vs ความพร้อมใช้)"
+      ]
+    },
+    {
+      "id": "CLD-38", "category": "cloud",
+      "q": "จะจัดการ secret (รหัสผ่าน/API key) ในระบบคลาวด์อย่างปลอดภัยอย่างไร",
+      "points": [
+        "ห้าม hardcode รหัส/คีย์ในโค้ดหรือ commit ลง repo",
+        "ใช้ Secret Manager / KMS / Vault เก็บและเข้ารหัส, ให้แอปเข้าถึงผ่าน IAM role",
+        "หมุน (rotate) เป็นระยะ, เข้ารหัสข้อมูลทั้ง at-rest และ in-transit, จำกัดสิทธิ์การอ่าน"
+      ]
+    },
+    {
+      "id": "CLD-39", "category": "cloud",
+      "q": "หลักการออกแบบที่ดีบนคลาวด์ (Well-Architected) มีด้านใดบ้าง",
+      "points": [
+        "5 เสา: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization (+ Sustainability)",
+        "ใช้เป็นกรอบตรวจสอบว่าออกแบบครบทุกด้านไหม",
+        "มัก trade-off ระหว่างเสา เช่น reliability (ทำ redundancy) vs cost"
+      ]
+    },
+    {
+      "id": "CLD-40", "category": "cloud",
+      "q": "จะออกแบบให้ผู้ใช้ทั่วโลกเข้าถึงได้เร็ว (ลด latency) อย่างไร",
+      "points": [
+        "CDN แคชเนื้อหา static ไว้ที่ edge ใกล้ผู้ใช้; deploy หลาย region สำหรับ dynamic",
+        "DNS-based geo routing / global load balancer ส่งผู้ใช้ไป region ใกล้สุด",
+        "Caching หลายชั้น + replication ข้อมูลข้าม region (ระวัง consistency), พิจารณา edge computing"
+      ]
+    },
+
+    {
+      "id": "SH-21", "category": "shell",
+      "q": "ลบไฟล์และโฟลเดอร์ทำอย่างไร และ rm -rf อันตรายอย่างไร",
+      "points": [
+        "rm file (ลบไฟล์), rm -r dir (ลบทั้งโฟลเดอร์), rmdir (เฉพาะโฟลเดอร์ว่าง)",
+        "rm -rf ลบถาวรทันทีไม่ถาม ไม่มี trash/undo — ระวัง rm -rf / หรือพิมพ์ path ผิด",
+        "ใช้ rm -i ให้ถามยืนยันก่อนลบ"
+      ]
+    },
+    {
+      "id": "SH-22", "category": "shell",
+      "q": "คัดลอกและย้าย/เปลี่ยนชื่อไฟล์ทำอย่างไร",
+      "points": [
+        "cp src dst (คัดลอก), cp -r สำหรับโฟลเดอร์",
+        "mv src dst (ย้าย) หรือเปลี่ยนชื่อ เช่น mv old.txt new.txt",
+        "ระวังทับไฟล์ปลายทาง: -i (ถามก่อนทับ), -n (ไม่ทับของเดิม)"
+      ]
+    },
+    {
+      "id": "SH-23", "category": "shell",
+      "q": "สร้างโฟลเดอร์ซ้อนหลายชั้นและสร้างไฟล์เปล่าทำอย่างไร",
+      "points": [
+        "mkdir dir (สร้างโฟลเดอร์), mkdir -p a/b/c (สร้างซ้อนหลายชั้นในคำสั่งเดียว)",
+        "touch file (สร้างไฟล์เปล่า หรืออัปเดต timestamp ถ้ามีอยู่แล้ว)"
+      ]
+    },
+    {
+      "id": "SH-24", "category": "shell",
+      "q": "ตัวเชื่อมคำสั่ง ; && || ต่างกันอย่างไร",
+      "points": [
+        "cmd1 ; cmd2 → รันต่อกันไม่สนผลลัพธ์",
+        "cmd1 && cmd2 → รัน cmd2 เมื่อ cmd1 สำเร็จ (exit code 0)",
+        "cmd1 || cmd2 → รัน cmd2 เมื่อ cmd1 ล้มเหลว",
+        "เช่น mkdir build && cd build (เข้าเฉพาะเมื่อสร้างสำเร็จ)"
+      ]
+    },
+    {
+      "id": "SH-25", "category": "shell",
+      "q": "นับ เรียง และตัดข้อมูลซ้ำด้วย wc, sort, uniq ทำอย่างไร",
+      "points": [
+        "wc -l (นับบรรทัด), -w (คำ), -c (ไบต์)",
+        "sort (เรียง), sort -n (ตามตัวเลข), -r (จากมากไปน้อย)",
+        "uniq ตัดซ้ำที่ติดกัน (ต้อง sort ก่อน); sort | uniq -c นับความถี่แต่ละค่า"
+      ]
+    },
+    {
+      "id": "SH-26", "category": "shell",
+      "q": "ใช้ประวัติคำสั่งและปุ่มลัดใน terminal อย่างไร",
+      "points": [
+        "history (ดูคำสั่งย้อนหลัง), !! (รันคำสั่งล่าสุด), !n (รันคำสั่งลำดับที่ n)",
+        "Ctrl+R ค้นในประวัติ, Ctrl+C ยกเลิกคำสั่งที่รันอยู่, Ctrl+Z พักงาน",
+        "Ctrl+A/Ctrl+E ไปต้น/ท้ายบรรทัด, Tab เติมชื่ออัตโนมัติ"
+      ]
+    },
+    {
+      "id": "SH-27", "category": "shell",
+      "q": "จะหาว่าคำสั่งหนึ่งอยู่ที่ไหนและดูวิธีใช้อย่างไร",
+      "points": [
+        "which cmd / type cmd / command -v cmd → บอก path/ชนิดของคำสั่ง",
+        "man cmd (คู่มือเต็ม), cmd --help (ช่วยเหลือสั้น)",
+        "apropos <keyword> ค้นหาคำสั่งที่เกี่ยวข้อง"
+      ]
+    },
+    {
+      "id": "SH-28", "category": "shell",
+      "q": "รันงานเบื้องหลัง (background) และสลับ foreground/background ทำอย่างไร",
+      "points": [
+        "cmd & รันเบื้องหลัง, jobs ดูงานที่ค้าง, fg นำกลับหน้า, bg ให้ทำต่อเบื้องหลัง",
+        "Ctrl+Z พักงาน (suspend) ที่รันอยู่",
+        "nohup cmd & หรือ disown ให้รันต่อแม้ปิด terminal"
+      ]
+    },
+    {
+      "id": "SH-29", "category": "shell",
+      "q": "Absolute path กับ Relative path ต่างกันอย่างไร",
+      "points": [
+        "Absolute เริ่มจาก / (root) เช่น /var/log/syslog — ชี้ตำแหน่งเดียวเสมอ",
+        "Relative อ้างจากตำแหน่งปัจจุบัน เช่น ./file, ../dir",
+        "สัญลักษณ์: . = ปัจจุบัน, .. = แม่, ~ = home, / = root; ./script.sh รันไฟล์ในโฟลเดอร์ปัจจุบัน"
+      ]
+    },
+    {
+      "id": "SH-30", "category": "shell",
+      "q": "อ่านผลลัพธ์ ls -l อย่างไร และอักขระตัวแรกแต่ละตัวหมายถึงอะไร",
+      "points": [
+        "อักขระแรก: - ไฟล์ปกติ, d ไดเรกทอรี, l symbolic link, c/b device file",
+        "คอลัมน์: สิทธิ์ | จำนวน link | owner | group | ขนาด | เวลาแก้ไข | ชื่อ",
+        "คำสั่ง file <name> บอกชนิดไฟล์จริง (text/binary/รูป)"
+      ]
+    },
+    {
+      "id": "SH-31", "category": "shell",
+      "q": "umask คืออะไร มีผลต่อสิทธิ์ไฟล์ที่สร้างใหม่อย่างไร",
+      "points": [
+        "umask กำหนดสิทธิ์เริ่มต้นของไฟล์/โฟลเดอร์ใหม่ โดย 'หักออก' จากค่า default",
+        "default ไฟล์ = 666, โฟลเดอร์ = 777",
+        "umask 022 → ไฟล์ได้ 644 (rw-r--r--), โฟลเดอร์ได้ 755 (rwxr-xr-x)"
+      ]
+    },
+    {
+      "id": "SH-32", "category": "shell",
+      "q": "ตัดคอลัมน์และแปลงอักขระด้วย cut และ tr ทำอย่างไร",
+      "points": [
+        "cut -d',' -f1 → ตัดเอา field ที่ 1 โดยใช้ , เป็นตัวคั่น",
+        "tr 'a-z' 'A-Z' → แปลงพิมพ์เล็กเป็นใหญ่; tr -d ลบอักขระที่ระบุ",
+        "มักใช้คู่ pipe เพื่อดึง/แปลงข้อมูลจาก output"
+      ]
+    },
+    {
+      "id": "SH-33", "category": "shell",
+      "q": "grep แบบขั้นสูงทำอะไรได้บ้าง (regex, context)",
+      "points": [
+        "grep -E 'a|b' ใช้ regex ขยาย, -o แสดงเฉพาะส่วนที่ตรง",
+        "-A n / -B n / -C n แสดงบรรทัดหลัง/ก่อน/รอบ (context)",
+        "-w คำเต็ม, -l เฉพาะชื่อไฟล์ที่พบ, -c นับจำนวนที่ตรง"
+      ]
+    },
+    {
+      "id": "SH-34", "category": "shell",
+      "q": "จะทำงานกับไฟล์จำนวนมากที่ค้นเจอด้วย find อย่างไร (-exec / xargs)",
+      "points": [
+        "find . -name '*.tmp' -delete หรือ -exec rm {} \\;",
+        "find . -name '*.log' | xargs gzip → ส่งผลลัพธ์เป็น argument ให้อีกคำสั่ง",
+        "ใช้ find -print0 | xargs -0 เพื่อรองรับชื่อไฟล์ที่มีช่องว่าง"
+      ]
+    },
+    {
+      "id": "SH-35", "category": "shell",
+      "q": "ดูการใช้ทรัพยากรของเครื่อง (CPU, RAM, load) ด้วยคำสั่งอะไร",
+      "points": [
+        "top / htop → โปรเซส + CPU/หน่วยความจำแบบเรียลไทม์",
+        "free -h → หน่วยความจำ; uptime → load average (1/5/15 นาที)",
+        "load average เทียบกับจำนวน core (เกินจำนวน core = เครื่องเริ่มแน่น); df -h ดิสก์"
+      ]
+    },
+    {
+      "id": "SH-36", "category": "shell",
+      "q": "ดูข้อมูลผู้ใช้และกลุ่ม (user/group) ใน Linux ทำอย่างไร",
+      "points": [
+        "whoami (ฉันคือใคร), id (uid/gid/กลุ่มทั้งหมด), groups",
+        "/etc/passwd เก็บบัญชีผู้ใช้, /etc/group เก็บกลุ่ม",
+        "useradd/usermod จัดการผู้ใช้, passwd เปลี่ยนรหัส (มัก sudo)"
+      ]
+    },
+    {
+      "id": "SH-37", "category": "shell",
+      "q": "จัดการแพ็กเกจและ service (systemctl) ใน Linux ทำอย่างไร",
+      "points": [
+        "แพ็กเกจ: apt/yum/dnf install|remove|update <pkg> (Debian ใช้ apt, RHEL ใช้ yum/dnf)",
+        "service: systemctl status|start|stop|restart <svc>; enable ให้เริ่มตอนบูต",
+        "journalctl -u <svc> ดู log ของ service นั้น"
+      ]
+    },
+    {
+      "id": "SH-38", "category": "shell",
+      "q": "ติดตามค่าที่เปลี่ยนแปลงและเปรียบเทียบไฟล์ทำอย่างไร (watch, diff)",
+      "points": [
+        "watch -n 2 <cmd> → รันคำสั่งซ้ำทุก 2 วินาที เพื่อดูค่าที่เปลี่ยน",
+        "diff a.txt b.txt เทียบสองไฟล์; diff -u ให้รูปแบบ unified (เหมือน patch)",
+        "comm เทียบไฟล์ที่ sort แล้ว, cmp เทียบระดับไบต์"
+      ]
+    },
+    {
+      "id": "SH-39", "category": "shell",
+      "q": "Exit code ($?) คืออะไร ใช้ตรวจผลคำสั่งอย่างไร",
+      "points": [
+        "$? = exit code ของคำสั่งล่าสุด: 0 = สำเร็จ, ไม่ใช่ 0 = ผิดพลาด",
+        "ใช้ร่วมกับ && || หรือ if ในสคริปต์เพื่อตัดสินใจตามผล",
+        "ในสคริปต์ set -e ทำให้หยุดทันทีเมื่อคำสั่งใด fail; exit N คืน code เอง"
+      ]
+    },
+    {
+      "id": "SH-40", "category": "shell",
+      "q": "ตั้ง alias และปรับแต่ง shell ให้ถาวรทำอย่างไร",
+      "points": [
+        "alias ll='ls -la' ตั้งชื่อย่อคำสั่งที่ใช้บ่อย",
+        "ใส่ลงไฟล์ ~/.bashrc (หรือ ~/.zshrc, ~/.bash_profile) เพื่อให้ถาวรทุกครั้งที่เปิด shell",
+        "source ~/.bashrc โหลดค่าใหม่โดยไม่ต้องเปิด terminal ใหม่"
+      ]
     }
   ]
 }

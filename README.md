@@ -7,17 +7,18 @@
 
 | หัวข้อ | เนื้อหา | จำนวน |
 |---|---|---|
-| 🌐 **Network Fundamentals & Troubleshooting** | OSI/TCP-IP, TCP/UDP, subnetting, DNS/DHCP/ARP, routing, troubleshooting | 20 |
-| ☁️ **Cloud Fundamentals & Architecture** | IaaS/PaaS/SaaS, scaling/HA, containers/K8s, CI-CD, IaC, CAP, system design | 20 |
-| ⌨️ **Basic Shell** | chmod/chown, ไฟล์/กระบวนการ, pipe/redirect, grep/find, ssh, cron, tar | 20 |
+| 🌐 **Network Fundamentals & Troubleshooting** | OSI/TCP-IP, TCP/UDP, subnetting/VLSM, DNS/DHCP/ARP, routing, troubleshooting, design scenarios | 40 |
+| ☁️ **Cloud Fundamentals & Architecture** | IaaS/PaaS/SaaS, scaling/HA, containers/K8s, CI-CD, IaC, CAP, system design, DR | 40 |
+| ⌨️ **Basic Shell** | chmod/chown, ไฟล์/กระบวนการ, pipe/redirect, grep/find/sed/awk, ssh, cron, systemctl | 40 |
 
 ## ฟีเจอร์
 
 - **สุ่มคำถามขึ้นกลางจอ** ตัวใหญ่ ชัด (ไม่ถามซ้ำจนกว่าจะครบทุกข้อ)
 - **จับเวลาต่อข้อ** 45 / 90 / 120 / 180 วินาที หรือโหมดนับขึ้น (ไม่จับเวลา) — เตือนสีเมื่อใกล้หมด
 - **แนวคำตอบ / ประเด็นที่ควรพูดถึง** กดดูเพื่อเทียบกับที่ตอบไปเอง
+- **ปักธง (🚩 bookmark)** ข้อที่ยังไม่เข้าใจ เก็บใน localStorage (อยู่แม้ปิดเว็บ) + โหมด "ทบทวนเฉพาะที่ปักธง"
 - **เลือกหัวข้อ** ฝึกทีละหัวข้อหรือรวมกัน
-- **โหมดมืด** · คีย์ลัด `Space` ดูคำตอบ · `→`/`Enter` ข้อถัดไป · `P` พัก · รองรับมือถือ
+- **โหมดมืด** · คีย์ลัด `Space` ดูคำตอบ · `→`/`Enter` ข้อถัดไป · `F` ปักธง · `P` พัก · รองรับมือถือ
 
 ## โครงสร้าง
 

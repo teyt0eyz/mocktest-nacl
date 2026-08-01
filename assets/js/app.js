@@ -22,8 +22,10 @@ const store = (k, v) => {
 /* ─── state ─── */
 let DATA = null;
 const cfg = { cats: new Set(), seconds: 90, auto: false, shuffle: true };
-let session = null;   // { queue, pos, seen, revealedCount }
+let session = null;   // { queue, pos, viewed, revealed, currentId }
 let timer = { id: null, remain: 0, elapsed: 0, paused: false };
+const flags = new Set(store('nacl_flags') || []);   // flagged question ids (persisted)
+const saveFlags = () => store('nacl_flags', [...flags]);
 
 /* ─── boot ─── */
 (async function init() {
@@ -39,11 +41,20 @@ let timer = { id: null, remain: 0, elapsed: 0, paused: false };
     return;
   }
   DATA.categories.forEach(c => cfg.cats.add(c.id));   // default: all selected
+  pruneFlags();
   renderTopics();
   bindSetup();
   bindPractice();
   updateStartInfo();
+  renderFlagBar();
 })();
+
+/* drop flagged ids that no longer exist in the data */
+function pruneFlags() {
+  const valid = new Set(DATA.questions.map(q => q.id));
+  [...flags].forEach(id => { if (!valid.has(id)) flags.delete(id); });
+  saveFlags();
+}
 
 /* ─── theme ─── */
 function toggleTheme() {
@@ -82,6 +93,10 @@ function bindSetup() {
   $('#optAuto').addEventListener('change', e => cfg.auto = e.target.checked);
   $('#optShuffleOrder').addEventListener('change', e => cfg.shuffle = e.target.checked);
   $('#btnStart').addEventListener('click', startSession);
+  $('#btnReviewFlagged').addEventListener('click', startFlaggedSession);
+  $('#btnClearFlags').addEventListener('click', () => {
+    if (flags.size && confirm(`ล้างธงทั้งหมด ${flags.size} ข้อ?`)) clearFlags();
+  });
   $$('[data-nav="home"]').forEach(b => b.addEventListener('click', goHome));
 }
 
@@ -120,7 +135,39 @@ function loadQuestion() {
   $('#answerCard').hidden = true;
   $('#btnReveal').textContent = '👁 ดูแนวคำตอบ';
   $('#btnNext').textContent = (session.pos + 1 >= total) ? 'ดูสรุป →' : 'ข้อถัดไป →';
+  session.currentId = q.id;
+  updateFlagBtn();
   startTimer();
+}
+
+/* ─── flags (bookmark for later review) ─── */
+function updateFlagBtn() {
+  const on = session && flags.has(session.currentId);
+  const b = $('#btnFlag');
+  b.classList.toggle('is-flagged', !!on);
+  b.textContent = on ? '🚩 ปักธงแล้ว' : '⚑ ปักธง';
+}
+function toggleFlag() {
+  if (!session || !session.currentId) return;
+  const id = session.currentId;
+  if (flags.has(id)) flags.delete(id); else flags.add(id);
+  saveFlags();
+  updateFlagBtn();
+}
+function renderFlagBar() {
+  const bar = $('#flagBar');
+  bar.hidden = flags.size === 0;
+  $('#flagCount').textContent = flags.size;
+}
+function startFlaggedSession() {
+  const pool = DATA.questions.filter(q => flags.has(q.id));
+  if (!pool.length) return;
+  session = { queue: shuffled(pool), pos: 0, viewed: 0, revealed: 0 };
+  show('practice');
+  loadQuestion();
+}
+function clearFlags() {
+  flags.clear(); saveFlags(); renderFlagBar();
 }
 function nextQuestion() {
   session.pos++;
@@ -182,6 +229,7 @@ function bindPractice() {
   $('#btnNext').addEventListener('click', nextQuestion);
   $('#btnPause').addEventListener('click', togglePause);
   $('#btnEnd').addEventListener('click', endSession);
+  $('#btnFlag').addEventListener('click', toggleFlag);
   $('#btnAgain').addEventListener('click', startSession);   // new shuffled round, same topics
   $('#btnHome').addEventListener('click', goHome);
   document.addEventListener('keydown', e => {
@@ -190,6 +238,7 @@ function bindPractice() {
     if (e.code === 'Space') { e.preventDefault(); reveal(); }
     else if (e.code === 'ArrowRight' || e.code === 'Enter') { e.preventDefault(); nextQuestion(); }
     else if (e.key.toLowerCase() === 'p') { togglePause(); }
+    else if (e.key.toLowerCase() === 'f') { toggleFlag(); }
   });
 }
 function endSession() {
@@ -206,4 +255,4 @@ function show(id) {
   if (id !== 'practice') clearInterval(timer.id);
   window.scrollTo(0, 0);
 }
-function goHome() { clearInterval(timer.id); show('setup'); updateStartInfo(); }
+function goHome() { clearInterval(timer.id); show('setup'); updateStartInfo(); renderFlagBar(); }

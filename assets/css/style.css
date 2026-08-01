@@ -190,6 +190,16 @@ main{flex:1;padding:28px 0 48px}
 .summary-line{color:var(--text-2);font-size:1.05rem;line-height:1.9}
 .summary-actions{display:flex;gap:.8rem;justify-content:center;margin-top:1.4rem;flex-wrap:wrap}
 
+/* flag / bookmark */
+.flag-btn.is-flagged{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.flag-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  background:var(--warn-bg);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent);
+  border-radius:var(--r-lg);padding:.9rem 1.3rem;margin:-6px 0 14px}
+.flag-bar-label{color:var(--warn);font-weight:500}
+.flag-bar-label b{color:var(--warn);font-weight:700}
+.flag-bar-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.secondary-btn.sm{padding:.5rem .9rem;font-size:.85rem}
+
 /* footer */
 .foot{border-top:1px solid var(--border);padding:1.4rem 0;color:var(--muted);font-size:.85rem;text-align:center}
 
